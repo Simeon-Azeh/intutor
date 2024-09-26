@@ -6,6 +6,7 @@ import { z } from "zod";
 import InputField from "../InputField";
 import Image from "next/image";
 
+// Define the schema using Zod
 const schema = z.object({
   username: z
     .string()
@@ -25,14 +26,31 @@ const schema = z.object({
   img: z.instanceof(File, { message: "Image is required" }),
 });
 
+// Infer the schema to get the form input types
 type Inputs = z.infer<typeof schema>;
 
+// Define a type for `data`
+type StudentFormData = {
+  username?: string;
+  email?: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  address?: string;
+  bloodType?: string;
+  birthday?: string; // Assuming you're passing birthday as a string
+  sex?: "male" | "female";
+  img?: File; // Optional if updating without changing the image
+};
+
+// Update the component to use the correct type
 const StudentForm = ({
   type,
   data,
 }: {
   type: "create" | "update";
-  data?: any;
+  data?: StudentFormData; // Replace 'any' with 'StudentFormData'
 }) => {
   const {
     register,
@@ -42,16 +60,20 @@ const StudentForm = ({
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
+  const onSubmit = handleSubmit((formData) => {
+    console.log(formData);
   });
 
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">Create a new student</h1>
+      <h1 className="text-xl font-semibold">
+        {type === "create" ? "Create a new student" : "Update student"}
+      </h1>
+
       <span className="text-xs text-gray-400 font-medium">
         Authentication Information
       </span>
+
       <div className="flex justify-between flex-wrap gap-4">
         <InputField
           label="Username"
@@ -76,9 +98,11 @@ const StudentForm = ({
           error={errors?.password}
         />
       </div>
+
       <span className="text-xs text-gray-400 font-medium">
         Personal Information
       </span>
+
       <div className="flex justify-between flex-wrap gap-4">
         <InputField
           label="First Name"
@@ -123,6 +147,7 @@ const StudentForm = ({
           error={errors.birthday}
           type="date"
         />
+
         <div className="flex flex-col gap-2 w-full md:w-1/4">
           <label className="text-xs text-gray-500">Sex</label>
           <select
@@ -139,6 +164,7 @@ const StudentForm = ({
             </p>
           )}
         </div>
+
         <div className="flex flex-col gap-2 w-full md:w-1/4 justify-center">
           <label
             className="text-xs text-gray-500 flex items-center gap-2 cursor-pointer"
@@ -155,6 +181,7 @@ const StudentForm = ({
           )}
         </div>
       </div>
+
       <button className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "Create" : "Update"}
       </button>

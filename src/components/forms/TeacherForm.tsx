@@ -6,6 +6,7 @@ import { z } from "zod";
 import InputField from "../InputField";
 import Image from "next/image";
 
+// Define the schema using Zod
 const schema = z.object({
   username: z
     .string()
@@ -25,14 +26,31 @@ const schema = z.object({
   img: z.instanceof(File, { message: "Image is required" }),
 });
 
+// Infer the schema to get the form input types
 type Inputs = z.infer<typeof schema>;
 
+// Define the type for the data prop
+type TeacherFormData = {
+  username?: string;
+  email?: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  address?: string;
+  bloodType?: string;
+  birthday?: string; // Can be string if you're passing dates as strings
+  sex?: "male" | "female";
+  img?: File; // Optional if it's an update form
+};
+
+// Use the defined type for the data prop
 const TeacherForm = ({
   type,
   data,
 }: {
   type: "create" | "update";
-  data?: any;
+  data?: TeacherFormData; // Use TeacherFormData instead of 'any'
 }) => {
   const {
     register,
@@ -42,16 +60,20 @@ const TeacherForm = ({
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
+  const onSubmit = handleSubmit((formData) => {
+    console.log(formData);
   });
 
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">Create a new teacher</h1>
+      <h1 className="text-xl font-semibold">
+        {type === "create" ? "Create a new teacher" : "Update teacher"}
+      </h1>
+
       <span className="text-xs text-gray-400 font-medium">
         Authentication Information
       </span>
+
       <div className="flex justify-between flex-wrap gap-4">
         <InputField
           label="Username"
@@ -76,9 +98,11 @@ const TeacherForm = ({
           error={errors?.password}
         />
       </div>
+
       <span className="text-xs text-gray-400 font-medium">
         Personal Information
       </span>
+
       <div className="flex justify-between flex-wrap gap-4">
         <InputField
           label="First Name"
@@ -139,6 +163,7 @@ const TeacherForm = ({
             </p>
           )}
         </div>
+
         <div className="flex flex-col gap-2 w-full md:w-1/4 justify-center">
           <label
             className="text-xs text-gray-500 flex items-center gap-2 cursor-pointer"
@@ -155,6 +180,7 @@ const TeacherForm = ({
           )}
         </div>
       </div>
+
       <button className="bg-blue-400 text-white p-2 rounded-md">
         {type === "create" ? "Create" : "Update"}
       </button>
