@@ -1,16 +1,16 @@
-import { FieldError, UseFormRegister } from "react-hook-form";
+import { FieldError } from "react-hook-form";
 
-type InputFieldProps<TFormValues> = {
+type InputFieldProps = {
   label: string;
   type?: string;
-  register: UseFormRegister<TFormValues>; // Make register type-safe
-  name: keyof TFormValues; // Use keyof to reference form fields correctly
+  register: any;
+  name: string;
   defaultValue?: string;
   error?: FieldError;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 };
 
-const InputField = <TFormValues,>({
+const InputField = ({
   label,
   type = "text",
   register,
@@ -18,13 +18,13 @@ const InputField = <TFormValues,>({
   defaultValue,
   error,
   inputProps,
-}: InputFieldProps<TFormValues>) => {
+}: InputFieldProps) => {
   return (
     <div className="flex flex-col gap-2 w-full md:w-1/4">
       <label className="text-xs text-gray-500">{label}</label>
       <input
         type={type}
-        {...register(name)} // Properly typed register function
+        {...register(name)}
         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full outline-none"
         {...inputProps}
         defaultValue={defaultValue}
