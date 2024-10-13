@@ -21,6 +21,9 @@ body {
   background: var(--background);
   font-family: 'Inter', sans-serif;
 }
+.inter {
+  font-family: 'Inter', sans-serif;
+}
 
 /* Tailwind custom styles */
 @layer utilities {
