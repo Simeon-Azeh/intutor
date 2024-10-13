@@ -32,7 +32,7 @@ const Header: React.FC = () => {
 
         {/* Hamburger icon for small screens */}
         <div className="md:hidden flex items-center">
-          <button type="button" title="menu" onClick={showDrawer} className="text-black">
+          <button type="button" title="menu" onClick={showDrawer} className="text-[#1a1a1a]">
             <RiMenu3Fill size={24} />
           </button>
         </div>
