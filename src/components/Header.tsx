@@ -21,7 +21,7 @@ const Header: React.FC = () => {
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   return (
-    <header className="bg-[#fff] py-2">
+    <header className="bg-[#fcfbfb] py-2">
       <nav className="container mx-auto flex justify-between items-center w-full md:w-4/5 px-4 md:px-0">
         {/* Logo Section */}
         <div className="w-24">
