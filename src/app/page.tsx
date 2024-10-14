@@ -1,3 +1,4 @@
+import Features from "@/components/Features";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Image from "next/image";
@@ -10,6 +11,9 @@ export default function Home() {
       </div>
     <div>
       <Hero />
+    </div>
+    <div>
+      <Features />
     </div>
     </div>
   );
