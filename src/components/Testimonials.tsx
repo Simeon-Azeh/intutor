@@ -51,55 +51,62 @@ const Testimonials: React.FC = () => {
     },
   ];
 
+  // Helper function to split testimonials into groups of 3 for larger screens
+  const getLargeScreenSlides = (items: typeof testimonials) => {
+    const slides = [];
+    for (let i = 0; i < items.length; i += 3) {
+      slides.push(items.slice(i, i + 3));
+    }
+    return slides;
+  };
+
+  const largeScreenTestimonials = getLargeScreenSlides(testimonials);
+
   return (
     <section className="bg-[#018abd] py-16 overflow-hidden">
       <div className="container mx-auto w-full md:w-4/5 px-6 md:px-0">
         {/* Section Header */}
-        <h2 className="text-2xl font-semibold text-white  mb-5">
+        <h2 className="text-2xl font-semibold text-white mb-5">
           Testimonials
         </h2>
 
-        {/* Carousel for larger screens (3 cards) */}
-        <div className="hidden md:block ">
+        {/* Carousel for larger screens (3 cards per slide) */}
+        <div className="hidden md:block">
           <Carousel autoplay dots={{ className: "custom-dots" }}>
-            {testimonials.map((_, slideIndex) => (
-              <div key={slideIndex}>
+            {largeScreenTestimonials.map((group, groupIndex) => (
+              <div key={groupIndex}>
                 <div className="flex justify-between">
-                  {testimonials
-                    .slice(slideIndex * 3, slideIndex * 3 + 3)
-                    .map((testimonial, index) => (
-                      <div key={index} className="p-4 w-1/3">
-                        <div className="bg-white shadow-md rounded-lg p-6 relative h-64 flex flex-col justify-between">
-                          {/* Quote Icon */}
-                          <FaQuoteLeft className="absolute -top-3 left-4 text-4xl text-gray-200" />
-                          <p className="text-xl italic text-gray-700 mb-4 overflow-hidden h-42">
-                            "{testimonial.testimonial}"
-                          </p>
-                          <div className="mt-auto">
-                            <h4 className="text-lg font-semibold text-[#002266]">
-                              {testimonial.name}
-                            </h4>
-                            <p className="text-gray-500">
-                              {testimonial.role}
-                            </p>
-                          </div>
+                  {group.map((testimonial, index) => (
+                    <div key={index} className="p-4 w-1/3">
+                      <div className="bg-white shadow-md rounded-lg p-6 relative h-64 flex flex-col justify-between">
+                        {/* Quote Icon */}
+                        <FaQuoteLeft className="absolute -top-3 left-4 text-4xl text-gray-200" />
+                        <p className="text-lg italic text-gray-700 mb-4 overflow-hidden h-42">
+                          "{testimonial.testimonial}"
+                        </p>
+                        <div className="mt-auto">
+                          <h4 className="text-lg font-semibold text-[#002266]">
+                            {testimonial.name}
+                          </h4>
+                          <p className="text-gray-500">{testimonial.role}</p>
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
           </Carousel>
         </div>
 
-        {/* Carousel for mobile screens (1 card) */}
+        {/* Carousel for mobile screens (1 card per slide) */}
         <div className="block md:hidden">
           <Carousel autoplay dots={{ className: "custom-dots" }}>
             {testimonials.map((testimonial, index) => (
               <div key={index} className="p-4">
                 <div className="bg-white shadow-md rounded-lg p-6 relative h-64 flex flex-col justify-between">
                   {/* Quote Icon */}
-                  <FaQuoteLeft className="absolute top-4 left-4 text-4xl text-gray-200" />
+                  <FaQuoteLeft className="absolute -top-4 left-4 text-4xl text-gray-200" />
                   <p className="text-xl italic text-gray-700 mb-4 overflow-hidden h-24">
                     "{testimonial.testimonial}"
                   </p>
