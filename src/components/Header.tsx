@@ -120,7 +120,7 @@ const Header: React.FC = () => {
           <li><Link href="/contact" onClick={closeDrawer}>Contact</Link></li>
         </ul>
         <div className=" flex  space-x-4 items-center gap-2 inter">
-        <Link href="/signup" passHref className="bg-[#018abd] text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-500 transition flex items-center gap-2">
+        <Link href="/signin" passHref className="bg-[#018abd] text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-500 transition flex items-center gap-2">
         <FaRegCircleUser />
             Login
         
