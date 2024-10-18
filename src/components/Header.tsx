@@ -77,7 +77,7 @@ const Header: React.FC = () => {
 
         {/* Call-to-action (CTA) Buttons */}
         <div className="hidden md:flex space-x-4 items-center gap-2">
-        <Link href="/signup" passHref className="bg-[#018abd] text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-500 transition flex items-center gap-2">
+        <Link href="/signin" passHref className="bg-[#018abd] text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-500 transition flex items-center gap-2">
         <FaRegCircleUser />
             Login
            
