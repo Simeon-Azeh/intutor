@@ -3,10 +3,10 @@ const Announcements = () => {
     <div className="bg-white p-4 rounded-md">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Announcements</h1>
-        <span className="text-xs text-gray-400">View All</span>
+        <span className="text-xs text-gray-400 cursor-pointer">View All</span>
       </div>
       <div className="flex flex-col gap-4 mt-4 ">
-        <div className="border border-[#e77813] rounded-md p-4 cursor-pointer relative shadow-md transition-transform transform hover:scale-105 hover:shadow-lg">
+        <div className="border border-[#018abd] rounded-md p-4 cursor-pointer relative shadow-md transition-transform transform hover:scale-105 hover:shadow-lg">
           <div className="flex items-center justify-between ">
             <h2 className="font-medium">Lorem ipsum dolor sit</h2>
             <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
@@ -18,7 +18,7 @@ const Announcements = () => {
             expedita. Rerum, quidem facilis?
           </p>
         </div>
-        <div className="border border-[#e77813] rounded-md p-4 cursor-pointer relative shadow-md transition-transform transform hover:scale-105 hover:shadow-lg">
+        <div className="border border-[#018abd] rounded-md p-4 cursor-pointer relative shadow-md transition-transform transform hover:scale-105 hover:shadow-lg">
           <div className="flex items-center justify-between cursor-pointer">
             <h2 className="font-medium">Lorem ipsum dolor sit</h2>
             <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
@@ -30,7 +30,7 @@ const Announcements = () => {
             expedita. Rerum, quidem facilis?
           </p>
         </div>
-        <div className="border border-[#e77813] rounded-md p-4 cursor-pointer relative shadow-md transition-transform transform hover:scale-105 hover:shadow-lg">
+        <div className="border border-[#018abd] rounded-md p-4 cursor-pointer relative shadow-md transition-transform transform hover:scale-105 hover:shadow-lg">
           <div className="flex items-center justify-between">
             <h2 className="font-medium">Lorem ipsum dolor sit</h2>
             <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">

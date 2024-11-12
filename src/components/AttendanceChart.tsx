@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { IoIosMore } from "react-icons/io";
 import {
   BarChart,
   Bar,
@@ -44,7 +45,7 @@ const AttendanceChart = () => {
     <div className="bg-white rounded-lg p-4 h-full">
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold">Attendance</h1>
-        <Image src="/moreDark.png" alt="" width={20} height={20} />
+        <IoIosMore size={20} className="cursor-pointer" />
       </div>
       <ResponsiveContainer width="100%" height="90%">
         <BarChart width={500} height={300} data={data} barSize={20}>
@@ -66,13 +67,13 @@ const AttendanceChart = () => {
           />
           <Bar
             dataKey="present"
-            fill="#587cff"
+            fill="#018abd"
             legendType="circle"
             radius={[10, 10, 0, 0]}
           />
           <Bar
             dataKey="absent"
-            fill="#ffab57"
+            fill="#ff6347"
             legendType="circle"
             radius={[10, 10, 0, 0]}
           />

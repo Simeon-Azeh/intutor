@@ -59,7 +59,7 @@ const EventCalendar = () => {
       <div className="mt-4 space-y-4">
         {events.map((event) => (
           <div
-            className="p-4 rounded-lg shadow-md border border-[#e77813] cursor-pointer bg-white relative transition-transform transform hover:scale-105 hover:shadow-lg"
+            className="p-4 rounded-lg shadow-md border border-[#018abd] cursor-pointer bg-white relative transition-transform transform hover:scale-105 hover:shadow-lg"
             key={event.id}
           >
             <div className="flex items-center justify-between">

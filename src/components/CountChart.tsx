@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { IoIosMore } from "react-icons/io";
 import {
   RadialBarChart,
   RadialBar,
@@ -10,17 +11,17 @@ const data = [
   {
     name: "Total",
     count: 106,
-    fill: "white",
+    fill: "#f9feff",
   },
   {
     name: "Girls",
     count: 53,
-    fill: "#ffab57",
+    fill: "#ff6347",
   },
   {
     name: "Boys",
     count: 53,
-    fill: "#587cff",
+    fill: "#018abd",
   },
 ];
 
@@ -30,7 +31,7 @@ const CountChart = () => {
       {/* TITLE */}
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold">Students</h1>
-        <Image src="/moreDark.png" alt="" width={20} height={20} />
+        <IoIosMore size={20} className="cursor-pointer" />
       </div>
       {/* CHART */}
       <div className="relative w-full h-[75%]">
@@ -47,7 +48,7 @@ const CountChart = () => {
           </RadialBarChart>
         </ResponsiveContainer>
         <Image
-          src="/maleFemale.png"
+          src="/moreDark.png"
           alt=""
           width={50}
           height={50}
@@ -57,13 +58,13 @@ const CountChart = () => {
       {/* BOTTOM */}
       <div className="flex justify-center gap-16">
         <div className="flex flex-col gap-1">
-          <div className="w-5 h-5 bg-lamaSky rounded-full" />
-          <h1 className="font-bold">1,234</h1>
+          <div className="w-5 h-5 bg-[#018abd] rounded-full" />
+          <h1 className="font-bold">3</h1>
           <h2 className="text-xs text-gray-300">Boys (55%)</h2>
         </div>
         <div className="flex flex-col gap-1">
-          <div className="w-5 h-5 bg-lamaYellow rounded-full" />
-          <h1 className="font-bold">1,234</h1>
+          <div className="w-5 h-5 bg-[#ff6347] rounded-full" />
+          <h1 className="font-bold">1</h1>
           <h2 className="text-xs text-gray-300">Girls (45%)</h2>
         </div>
       </div>

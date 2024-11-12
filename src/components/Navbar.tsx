@@ -15,10 +15,10 @@ const Navbar = () => {
         </div>
         <div className='bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative'>
           <Image src="/announcement.png" alt="" width={20} height={20}/>
-          <div className='absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-[#ffab57] text-white rounded-full text-xs'>2</div>
+          <div className='absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-[#018abd] text-white rounded-full text-xs'>2</div>
         </div>
         <div className='flex flex-col'>
-          <span className="text-xs leading-3 font-medium">Foryoung Junior</span>
+          <span className="text-xs leading-3 font-medium">Simeon Kongnyuy</span>
           <span className="text-[10px] text-gray-500 text-right">Admin | HIMS Buea</span>
         </div>
         <Image src="/avatar.png" alt="" width={36} height={36} className="rounded-full"/>

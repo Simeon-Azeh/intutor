@@ -67,7 +67,7 @@ body {
 }
 
 .react-calendar__tile--active {
-  background-color: #ffab57 !important;
+  background-color: #018abd !important;
   color: rgb(255, 255, 255) !important;
 }
 
@@ -174,3 +174,14 @@ body {
   display: inline-flex;
   animation: marquee 30s linear infinite;
 }
+
+.loader {
+  border-top-color: #3182ce; /* Adjust to your primary color */
+  animation: spinner 0.6s linear infinite;
+}
+
+@keyframes spinner {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
