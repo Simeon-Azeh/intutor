@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";  // Import signOut along with getAuth
 import { getFirestore } from "firebase/firestore"; // Import Firestore
 
 const firebaseConfig = {
@@ -18,4 +18,7 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 // Initialize Firestore
-export const db = getFirestore(app);  // Add Firestore initialization here
+export const db = getFirestore(app);
+
+// Export signOut function
+export { signOut }; // Export signOut for use in your components

@@ -50,6 +50,7 @@ const SignInForm: React.FC = () => {
       // Fetch the user's role from Firestore
       const userDocRef = doc(db, "users", uid);  // Assuming your collection is called "users"
       const userDoc = await getDoc(userDocRef);
+      
   
       if (userDoc.exists()) {
         const userData = userDoc.data();
@@ -70,7 +71,7 @@ const SignInForm: React.FC = () => {
           case "Admin":
             router.push("/admin");
             break;
-          case "Teacher":
+          case "Peacher":
             router.push("/teacher");
             break;
           case "Parent":
