@@ -62,7 +62,7 @@ const Navbar = () => {
         </div>
         <div className="flex flex-col">
           <span className="text-xs leading-3 font-medium">{userName || "Loading..."}</span>
-          <span className="text-[10px] text-gray-500 text-right">{userSchool || "Loading..."} | {userRole || "Loading..."}</span>
+          <span className="text-[10px] text-gray-500 text-right"> {userRole || "Loading..."} | {userSchool || "Loading..."}  </span>
         </div>
         <Image src="/avatar.png" alt="" width={36} height={36} className="rounded-full" />
       </div>

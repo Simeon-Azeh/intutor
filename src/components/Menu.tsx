@@ -95,7 +95,7 @@ const Menu = () => {
                   href={item.href === "#" ? "#" : item.href}
                   key={item.label}
                   onClick={item.action === "logout" ? handleLogout : undefined}
-                  className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-[#f3eae1]"
+                  className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-[#e2f5fc]"
                 >
                   <Image src={item.icon} alt="" width={20} height={20} />
                   <span className="hidden lg:block">{item.label}</span>

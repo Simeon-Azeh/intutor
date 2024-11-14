@@ -49,7 +49,7 @@ const NewsletterSection: React.FC = () => {
           <label htmlFor="role" className="block text-sm font-medium text-gray-700">Choose Your Role</label>
           <select
             id="role"
-            value={role}
+            value={role} 
             onChange={(e) => setRole(e.target.value)}
             className="mt-1 block w-full p-4 border border-gray-300 rounded-md outline-none"
             required

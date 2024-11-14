@@ -155,7 +155,7 @@ const TeacherForm = ({
                     )}
                 </div>
             </div>
-            <button className="bg-[#e77813] text-white p-2 rounded-md">
+            <button className="bg-[#018abd] text-white p-2 rounded-md">
                 {type === "create" ? "Create" : "Update"}
             </button>
         </form>
