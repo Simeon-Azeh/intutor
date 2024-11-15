@@ -38,7 +38,7 @@ const events = [
 ];
 
 const EventCalendar = () => {
-  const [value, onChange] = useState<Date | null>(new Date()); 
+  const [value, setValue] = useState<Date | [Date, Date] | null>(new Date());
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState("");
@@ -64,12 +64,17 @@ const EventCalendar = () => {
   const handleEventSelection = (event: any) => {
     setSelectedEvent(event);
   };
+  const handleDateChange = (selectedDate: Date | [Date, Date] | null) => {
+    setValue(selectedDate);
+  };
+
+  
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md relative">
       {/* Styled Calendar */}
       <Calendar
-        onChange={onChange}
+       
         value={value}
         className="custom-calendar"
         tileClassName={({ date, view }) =>
@@ -138,246 +143,256 @@ const EventCalendar = () => {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-20">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-semibold text-gray-700">
-              {modalAction} Event
-            </h2>
-            {modalAction === "Add Event" && (
-              <>
-                <p className="mt-4 text-sm text-gray-600">
-                  Fill out the form to add a new event.
-                </p>
-                <form className="mt-4 space-y-4">
-                  {/* Add Event Form */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Event Title
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
-                      placeholder="Enter event title"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Date
-                    </label>
-                    <input
-                    title="date"
-                      type="date"
-                      className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Time
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
-                      placeholder="Enter event time (e.g., 3:00 PM - 4:00 PM)"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Description
-                    </label>
-                    <textarea
-                      className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
-                      placeholder="Enter event description"
-                    ></textarea>
-                  </div>
-                  <div className="flex justify-end space-x-4">
-                  <button
-          type="button"
-          className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition duration-200"
-          onClick={closeModal}
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
-        >
-          Save Changes
-        </button>
-      
-      </div>
-                </form>
-              </>
-            )}
-            {modalAction === "Edit Event" && !selectedEvent && (
-              <>
-                <p className="mt-4 text-sm text-gray-600">
-                  Select an event to edit:
-                </p>
-                <ul className="mt-4 space-y-2">
-                  {events.map((event) => (
-                    <li
-                      key={event.id}
-                      className="p-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200"
-                      onClick={() => handleEventSelection(event)}
-                    >
-                      {event.title} ({event.date})
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-         {modalAction === "Edit Event" && selectedEvent && (
-  <>
-    <p className="mt-4 text-sm text-gray-600">
-      Editing: <strong>{selectedEvent.title}</strong>
-    </p>
-    <form className="mt-4 space-y-4">
-      {/* Event Title */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Event Title
-        </label>
-        <input
-          type="text"
-          className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
-          defaultValue={selectedEvent.title}
-          placeholder="Enter event title"
-        />
-      </div>
+  <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-20">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+      <h2 className="text-xl font-semibold text-gray-700">
+        {modalAction} Event
+      </h2>
+      {modalAction === "Add Event" && (
+        <>
+          <p className="mt-4 text-sm text-gray-600">
+            Fill out the form to add a new event.
+          </p>
+          <form className="mt-4 space-y-4">
+            {/* Add Event Form */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Event Title
+              </label>
+              <input
+                type="text"
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
+                placeholder="Enter event title"
+                aria-label="Event Title"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Date
+              </label>
+              <input
+                type="date"
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
+                title="Event Date"
+                aria-label="Event Date"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Time
+              </label>
+              <input
+                type="text"
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
+                placeholder="Enter event time (e.g., 3:00 PM - 4:00 PM)"
+                aria-label="Event Time"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
+                placeholder="Enter event description"
+                aria-label="Event Description"
+              ></textarea>
+            </div>
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition duration-200"
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </>
+      )}
+      {modalAction === "Edit Event" && !selectedEvent && (
+        <>
+          <p className="mt-4 text-sm text-gray-600">
+            Select an event to edit:
+          </p>
+          <ul className="mt-4 space-y-2">
+            {events.map((event) => (
+              <li
+                key={event.id}
+                className="p-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200"
+                onClick={() => handleEventSelection(event)}
+              >
+                {event.title} ({event.date})
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {modalAction === "Edit Event" && selectedEvent && (
+        <>
+          <p className="mt-4 text-sm text-gray-600">
+            Editing: <strong>{selectedEvent.title}</strong>
+          </p>
+          <form className="mt-4 space-y-4">
+            {/* Event Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Event Title
+              </label>
+              <input
+                type="text"
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
+                defaultValue={selectedEvent.title}
+                placeholder="Enter event title"
+                aria-label="Event Title"
+              />
+            </div>
 
-      {/* Event Date */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Date
-        </label>
-        <input
-          type="date"
-          className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
-          defaultValue={selectedEvent.date}
-        />
-      </div>
+            {/* Event Date */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Date
+              </label>
+              <input
+                type="date"
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
+                defaultValue={selectedEvent.date}
+                title="Event Date"
+                aria-label="Event Date"
+              />
+            </div>
 
-      {/* Event Time */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Time
-        </label>
-        <input
-          type="text"
-          className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
-          defaultValue={selectedEvent.time}
-          placeholder="Enter event time (e.g., 3:00 PM - 4:00 PM)"
-        />
-      </div>
+            {/* Event Time */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Time
+              </label>
+              <input
+                type="text"
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
+                defaultValue={selectedEvent.time}
+                placeholder="Enter event time (e.g., 3:00 PM - 4:00 PM)"
+                aria-label="Event Time"
+              />
+            </div>
 
-      {/* Event Description */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Description
-        </label>
-        <textarea
-          className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
-          defaultValue={selectedEvent.description}
-          placeholder="Enter event description"
-        ></textarea>
-      </div>
+            {/* Event Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <textarea
+                className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#018abd]"
+                defaultValue={selectedEvent.description}
+                placeholder="Enter event description"
+                aria-label="Event Description"
+              ></textarea>
+            </div>
 
-      {/* Notify School or Teachers */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
-          Notify
-        </label>
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="notifySchool"
-            className="mr-2"
-            defaultChecked={false}
-          />
-          <label htmlFor="notifySchool" className="text-gray-600">
-            Notify School
-          </label>
-        </div>
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="notifyTeachers"
-            className="mr-2"
-            defaultChecked={false}
-          />
-          <label htmlFor="notifyTeachers" className="text-gray-600">
-            Notify Teachers
-          </label>
-        </div>
-      </div>
+            {/* Notify School or Teachers */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Notify
+              </label>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="notifySchool"
+                  className="mr-2"
+                  defaultChecked={false}
+                  aria-label="Notify School"
+                />
+                <label htmlFor="notifySchool" className="text-gray-600">
+                  Notify School
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="notifyTeachers"
+                  className="mr-2"
+                  defaultChecked={false}
+                  aria-label="Notify Teachers"
+                />
+                <label htmlFor="notifyTeachers" className="text-gray-600">
+                  Notify Teachers
+                </label>
+              </div>
+            </div>
 
-      {/* Submit Button */}
-      <div className="flex justify-end space-x-4">
-      <button
-          type="button"
-          className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition duration-200"
-          onClick={closeModal}
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
-        >
-          Save Changes
-        </button>
-      
-      </div>
-    </form>
-  </>
-)}
+            {/* Submit Button */}
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition duration-200"
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </>
+      )}
 
-            {modalAction === "Delete Event" && !selectedEvent && (
-              <>
-                <p className="mt-4 text-sm text-gray-600">
-                  Select an event to delete:
-                </p>
-                <ul className="mt-4 space-y-2">
-                  {events.map((event) => (
-                    <li
-                      key={event.id}
-                      className="p-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200"
-                      onClick={() => handleEventSelection(event)}
-                    >
-                      {event.title} ({event.date})
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-            {modalAction === "Delete Event" && selectedEvent && (
-              <>
-                <p className="mt-4 text-sm text-gray-600">
-                  Are you sure you want to delete{" "}
-                  <strong>{selectedEvent.title}</strong>?
-                </p>
-                <div className="mt-4 flex space-x-4">
-                  <button className="bg-red-500 text-white px-4 py-2 rounded-md">
-                    Delete
-                  </button>
-                  <button
-                    className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md"
-                    onClick={closeModal}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </>
-            )}
+      {modalAction === "Delete Event" && !selectedEvent && (
+        <>
+          <p className="mt-4 text-sm text-gray-600">
+            Select an event to delete:
+          </p>
+          <ul className="mt-4 space-y-2">
+            {events.map((event) => (
+              <li
+                key={event.id}
+                className="p-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200"
+                onClick={() => handleEventSelection(event)}
+              >
+                {event.title} ({event.date})
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {modalAction === "Delete Event" && selectedEvent && (
+        <>
+          <p className="mt-4 text-sm text-gray-600">
+            Are you sure you want to delete{" "}
+            <strong>{selectedEvent.title}</strong>?
+          </p>
+          <div className="mt-4 flex space-x-4">
+            <button className="bg-red-500 text-white px-4 py-2 rounded-md">
+              Delete
+            </button>
             <button
-              className="absolute top-2 right-2 text-gray-500"
+              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md"
               onClick={closeModal}
             >
-              Close
+              Cancel
             </button>
           </div>
-        </div>
+        </>
       )}
+      <button
+        className="absolute top-2 right-2 text-gray-500"
+        onClick={closeModal}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
