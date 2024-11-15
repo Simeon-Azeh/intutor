@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { IoIosMore } from "react-icons/io";
+import { Menu } from "@headlessui/react";
 import {
   RadialBarChart,
   RadialBar,
@@ -31,8 +32,49 @@ const CountChart = () => {
       {/* TITLE */}
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold">Students</h1>
-        <IoIosMore size={20} className="cursor-pointer" />
+        <Menu as="div" className="relative">
+          <Menu.Button>
+            <IoIosMore size={20} className="cursor-pointer" />
+          </Menu.Button>
+          <Menu.Items className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border p-1 z-50">
+            {/* Dropdown Actions */}
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  className={`${
+                    active ? "bg-gray-100" : ""
+                  } flex items-center w-full px-3 py-2 text-sm text-gray-700`}
+                >
+                  View Details
+                </button>
+              )}
+            </Menu.Item>
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  className={`${
+                    active ? "bg-gray-100" : ""
+                  } flex items-center w-full px-3 py-2 text-sm text-gray-700`}
+                >
+                  Export Data
+                </button>
+              )}
+            </Menu.Item>
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  className={`${
+                    active ? "bg-gray-100" : ""
+                  } flex items-center w-full px-3 py-2 text-sm text-red-500`}
+                >
+                  Delete Chart
+                </button>
+              )}
+            </Menu.Item>
+          </Menu.Items>
+        </Menu>
       </div>
+
       {/* CHART */}
       <div className="relative w-full h-[75%]">
         <ResponsiveContainer>
@@ -55,8 +97,9 @@ const CountChart = () => {
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
         />
       </div>
+
       {/* BOTTOM */}
-      <div className="flex justify-center gap-12 ">
+      <div className="flex justify-center gap-12">
         <div className="flex flex-col gap-1">
           <div className="w-5 h-5 bg-[#018abd] rounded-full" />
           <h1 className="font-bold">3</h1>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { auth } from "@/firebase/firebaseConfig"; // Firebase auth
 import { onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
+import { MdOutlineNotificationsActive } from "react-icons/md";
 
 const Navbar = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -57,7 +58,7 @@ const Navbar = () => {
           <Image src="/message.png" alt="" width={20} height={20} />
         </div>
         <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative">
-          <Image src="/announcement.png" alt="" width={20} height={20} />
+        <MdOutlineNotificationsActive size={26} className="text-gray-600" />
           <div className="absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-[#018abd] text-white rounded-full text-xs">2</div>
         </div>
         <div className="flex flex-col">
