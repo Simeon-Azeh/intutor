@@ -40,8 +40,28 @@ const AdminPage = () => {
   ];
 
   return (
-    <div className="p-4 flex gap-4 flex-col md:flex-row">
-      <Joyride steps={steps} run={runTour} continuous showProgress showSkipButton />
+    <div className="p-4 flex gap-4 flex-col md:flex-row ">
+      <div className="absolute bottom-0 bg-blue-500">
+      <Joyride steps={steps} run={runTour}   continuous showProgress showSkipButton
+       styles={{
+        options: {
+          arrowColor: "#fff",
+          backgroundColor: "#fff",
+          overlayColor: "rgba(0, 0, 0, 0.4)",
+          primaryColor: "#018abd",
+          textColor: "#1a1a1a",
+          zIndex: 1000,
+        },
+        tooltip: {
+          borderRadius: "8px",
+          boxShadow: "5px 4px 15px rgba(0, 0, 0, 0.04)",
+        },
+        tooltipContainer: {
+          textAlign: "center",
+        },
+      }}  />
+      </div>
+     
       {/* LEFT */}
       <div className="w-full lg:w-2/3 flex flex-col gap-8">
         {/* USER CARDS */}

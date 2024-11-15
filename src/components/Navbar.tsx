@@ -1,17 +1,22 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { auth } from "@/firebase/firebaseConfig"; // Firebase auth
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
 import { MdOutlineNotificationsActive } from "react-icons/md";
+import { TbHelpCircle } from "react-icons/tb";
+import { CgProfile } from "react-icons/cg";
+import { RiSettings4Line } from "react-icons/ri";
+import { IoMdLogOut } from "react-icons/io";
 
 const Navbar = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [userSchool, setUserSchool] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -44,28 +49,83 @@ const Navbar = () => {
     }
   };
 
+  const handleLogout = async () => {
+    await signOut(auth);
+    setUser(null);
+  };
+
   return (
     <div className="flex items-center justify-between p-4 bg-white">
       {/* SEARCH BAR */}
       <div className="hidden md:flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2">
         <Image src="/search.png" alt="" width={14} height={14} />
-        <input type="text" placeholder="Search..." className="w-[200px] p-2 bg-transparent outline-none" />
+        <input
+          type="text"
+          placeholder="Search..."
+          className="w-[200px] p-2 bg-transparent outline-none"
+        />
       </div>
 
       {/* ICONS AND USER */}
-      <div className="flex items-center gap-6 justify-end w-full">
-        <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer">
-          <Image src="/message.png" alt="" width={20} height={20} />
-        </div>
+      <div className="flex items-center gap-4 justify-end w-full relative">
         <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative">
-        <MdOutlineNotificationsActive size={26} className="text-gray-600" />
-          <div className="absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-[#018abd] text-white rounded-full text-xs">2</div>
+          <MdOutlineNotificationsActive size={26} className="text-gray-600" />
+          <div className="absolute -top-2 -right-2.5 w-5 h-5 flex items-center justify-center bg-[#018abd] text-white rounded-full text-xs">
+            2
+          </div>
         </div>
-        <div className="flex flex-col">
-          <span className="text-xs leading-3 font-medium">{userName || "Loading..."}</span>
-          <span className="text-[10px] text-gray-500 text-right"> {userRole || "Loading..."} | {userSchool || "Loading..."}  </span>
+        <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer">
+          <TbHelpCircle size={26} className="text-gray-600" />
         </div>
-        <Image src="/avatar.png" alt="" width={36} height={36} className="rounded-full" />
+        {/* Profile Section */}
+        <div
+          className="flex items-center gap-2 cursor-pointer relative"
+          onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+        >
+          <div className="flex flex-col">
+            <span className="text-xs leading-3 font-medium">
+              {userName || "Loading..."}
+            </span>
+            <span className="text-[10px] text-gray-500 text-right">
+              {userRole || "Loading..."} | {userSchool || "Loading..."}
+            </span>
+          </div>
+          <Image
+            src="/avatar.png"
+            alt=""
+            width={36}
+            height={36}
+            className="rounded-full"
+          />
+          {/* Dropdown Menu */}
+          {showProfileDropdown && (
+            <div className="absolute border top-10 right-0 w-48 bg-white shadow-lg rounded-lg py-2 z-50 font-medium ">
+              
+              <button
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-1"
+                onClick={() => console.log("View Profile")}
+              >
+                 <CgProfile />
+                View Profile
+               
+              </button>
+              <button
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-1"
+                onClick={() => console.log("Account Settings")}
+              >
+                <RiSettings4Line />
+                Account Settings
+              </button>
+              <button
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500 flex items-center gap-1"
+                onClick={handleLogout}
+              >
+                <IoMdLogOut />
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
