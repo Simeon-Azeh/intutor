@@ -8,9 +8,12 @@ import PartnerSlider from "@/components/PartnerSlider";
 import Pricing from "@/components/Pricing";
 import StudentAppSection from "@/components/StudentAppSection";
 import Testimonials from "@/components/Testimonials";
-import Image from "next/image";
+import { Metadata } from 'next'
+
+export const metadata: Metadata = { title: 'Home', };
 
 export default function Home() {
+  
   return (
     <div>
       <div className="top-0 sticky z-50">

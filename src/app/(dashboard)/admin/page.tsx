@@ -1,17 +1,51 @@
+"use client"
+
+import React, { useState } from "react";
 import Announcements from "@/components/Announcement";
 import AttendanceChart from "@/components/AttendanceChart";
 import CountChart from "@/components/CountChart";
 import EventCalendar from "@/components/EventCalendar";
 import FinanceChart from "@/components/FinanceChart";
 import UserCard from "@/components/UserCard";
+import Joyride from "react-joyride";
 
 const AdminPage = () => {
+  const [runTour, setRunTour] = useState(true);
+
+  const steps = [
+    {
+      target: ".user-cards",
+      content: "Here you can see user statistics, including counts for students, teachers, parents, and staff.",
+    },
+    {
+      target: ".count-chart",
+      content: "This chart shows user counts across different categories.",
+    },
+    {
+      target: ".attendance-chart",
+      content: "View attendance records here over various time periods.",
+    },
+    {
+      target: ".finance-chart",
+      content: "This chart provides financial data, including budget usage and expenses.",
+    },
+    {
+      target: ".event-calendar",
+      content: "The calendar displays upcoming events relevant to the school community.",
+    },
+    {
+      target: ".announcements",
+      content: "Check important announcements and updates here.",
+    }
+  ];
+
   return (
     <div className="p-4 flex gap-4 flex-col md:flex-row">
+      <Joyride steps={steps} run={runTour} continuous showProgress showSkipButton />
       {/* LEFT */}
       <div className="w-full lg:w-2/3 flex flex-col gap-8">
         {/* USER CARDS */}
-        <div className="flex gap-4 justify-between flex-wrap">
+        <div className="user-cards flex gap-4 justify-between flex-wrap">
           <UserCard type="student" />
           <UserCard type="teacher" />
           <UserCard type="parent" />
@@ -20,23 +54,27 @@ const AdminPage = () => {
         {/* MIDDLE CHARTS */}
         <div className="flex gap-4 flex-col lg:flex-row">
           {/* COUNT CHART */}
-          <div className="w-full lg:w-1/3 h-[450px]">
+          <div className="count-chart w-full lg:w-1/3 h-[450px]">
             <CountChart />
           </div>
           {/* ATTENDANCE CHART */}
-          <div className="w-full lg:w-2/3 h-[450px]">
+          <div className="attendance-chart w-full lg:w-2/3 h-[450px]">
             <AttendanceChart />
           </div>
         </div>
         {/* BOTTOM CHART */}
-        <div className="w-full h-[500px]">
+        <div className="finance-chart w-full h-[500px]">
           <FinanceChart />
         </div>
       </div>
       {/* RIGHT */}
       <div className="w-full lg:w-1/3 flex flex-col gap-8">
-        <EventCalendar />
-        <Announcements/>
+        <div className="event-calendar">
+          <EventCalendar />
+        </div>
+        <div className="announcements">
+          <Announcements />
+        </div>
       </div>
     </div>
   );

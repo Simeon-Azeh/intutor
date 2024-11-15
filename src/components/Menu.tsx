@@ -80,33 +80,42 @@ const Menu = () => {
       console.error("Error during logout:", error);
     }
   };
+  const homeHref = role === "Admin" ? "/admin" 
+  : role === "Teacher" ? "/teacher" 
+  : role === "Student" ? "/student" 
+  : role === "Parent" ? "/parent" 
+  : "/";
+
 
   return (
     <div className="text-sm h-full overflow-y-auto">
-      {menuItems.map((section) => (
-        <div className="flex flex-col gap-2" key={section.title}>
-          <span className="hidden lg:block text-gray-400 font-light my-4">
-            {section.title}
-          </span>
-          {section.items.map((item) => {
-            if (item.visible.includes(role)) {
-              return (
-                <Link
-                  href={item.href === "#" ? "#" : item.href}
-                  key={item.label}
-                  onClick={item.action === "logout" ? handleLogout : undefined}
-                  className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-[#e2f5fc]"
-                >
-                  <Image src={item.icon} alt="" width={20} height={20} />
-                  <span className="hidden lg:block">{item.label}</span>
-                </Link>
-              );
-            }
-            return null; // Return null if the role doesn't match
-          })}
-        </div>
-      ))}
-    </div>
+    {menuItems.map((section) => (
+      <div className="flex flex-col gap-2" key={section.title}>
+        <span className="hidden lg:block text-gray-400 font-light my-4">
+          {section.title}
+        </span>
+        {section.items.map((item) => {
+          // For the Home link, use the dynamic homeHref
+          const href = item.label === "Home" ? homeHref : item.href;
+
+          if (item.visible.includes(role)) {
+            return (
+              <Link
+                href={href === "#" ? "#" : href}
+                key={item.label}
+                onClick={item.action === "logout" ? handleLogout : undefined}
+                className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-[#e2f5fc]"
+              >
+                <Image src={item.icon} alt="" width={20} height={20} />
+                <span className="hidden lg:block">{item.label}</span>
+              </Link>
+            );
+          }
+          return null;
+        })}
+      </div>
+    ))}
+  </div>
   );
 };
 
