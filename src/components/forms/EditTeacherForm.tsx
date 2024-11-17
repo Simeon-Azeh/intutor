@@ -29,7 +29,7 @@ const schema = z.object({
     classesAssigned: z.array(z.string()).min(1, { message: "At least one class must be selected!" }),
 });
 
-type Inputs = z.infer<typeof schema>;
+export type Inputs = z.infer<typeof schema>;
 
 const subjects = [
     "Mathematics",
@@ -53,12 +53,12 @@ const classes = [
     "Class 8"
 ];
 
-interface TeacherFormProps {
+interface EditTeacherFormProps {
     data: Partial<Inputs>;
-    type: "create" | "update";
+    onSubmit: (data: Inputs) => void;
 }
 
-const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
+const EditTeacherForm: React.FC<EditTeacherFormProps> = ({ data, onSubmit }) => {
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<Inputs>({
         resolver: zodResolver(schema),
         defaultValues: {
@@ -104,10 +104,6 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
         setValue("classesAssigned", updatedClasses);
     };
 
-    const onSubmit = (formData: Inputs) => {
-        // Handle form submission
-    };
-
     const nextStep = () => setStep(prev => prev + 1);
     const prevStep = () => setStep(prev => prev - 1);
 
@@ -115,34 +111,15 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
         <form className="flex flex-col gap-8 overflow-y-auto overflow-x-hidden" onSubmit={handleSubmit(onSubmit)}>
             {step === 1 && (
                 <>
-                    <h1 className="text-xl font-semibold">Create a new teacher</h1>
+                   
                     <span className="text-base text-gray-600 font-medium flex items-center gap-2">
-                    <UserRoundPen size={20}/>
+                        <UserRoundPen size={20} />
                         Authentication Information
                     </span>
                     <div className="flex justify-between flex-wrap gap-4">
-                        <InputField
-                            label="Username"
-                            name="username"
-                            defaultValue={data?.username}
-                            register={register}
-                            error={errors?.username}
-                        />
-                        <InputField
-                            label="Email"
-                            name="email"
-                            defaultValue={data?.email}
-                            register={register}
-                            error={errors?.email}
-                        />
-                        <InputField
-                            label="Password"
-                            name="password"
-                            type="password"
-                            defaultValue={data?.password}
-                            register={register}
-                            error={errors?.password}
-                        />
+                        <InputField label="Username" name="username" register={register} error={errors.username} />
+                        <InputField label="Email" name="email" register={register} error={errors.email} />
+                        <InputField label="Password" name="password" type="password" register={register} error={errors.password} />
                     </div>
                     <button type="button" onClick={nextStep} className="bg-[#018abd] text-white p-2 rounded-md">
                         Next
@@ -152,86 +129,27 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
             {step === 2 && (
                 <>
                     <span className="text-base text-gray-600 font-medium flex items-center gap-2">
-                    <UserRound size={20}/>  Personal Information
+                        <UserRound size={20} /> Personal Information
                     </span>
                     <div className="flex justify-between flex-wrap gap-4">
-                        <InputField
-                            label="First Name"
-                            name="firstName"
-                            defaultValue={data?.firstName}
-                            register={register}
-                            error={errors.firstName}
-                        />
-                        <InputField
-                            label="Last Name"
-                            name="lastName"
-                            defaultValue={data?.lastName}
-                            register={register}
-                            error={errors.lastName}
-                        />
-                        <InputField
-                            label="Phone"
-                            name="phone"
-                            defaultValue={data?.phone}
-                            register={register}
-                            error={errors.phone}
-                        />
-                        <InputField
-                            label="Address"
-                            name="address"
-                            defaultValue={data?.address}
-                            register={register}
-                            error={errors.address}
-                        />
-                        <InputField
-                            label="Emergency Contact"
-                            name="emergencyContact"
-                            defaultValue={data?.emergencyContact}
-                            register={register}
-                            error={errors.emergencyContact}
-                        />
-                        <InputField
-                            label="Birthday"
-                            name="birthday"
-                            defaultValue={data?.birthday ? new Date(data.birthday).toISOString().split('T')[0] : ''}
-                            register={register}
-                            error={errors.birthday}
-                            type="date"
-                        />
-                        <div className="flex flex-col gap-2 w-full md:w-1/4">
+                        <InputField label="First Name" name="firstName" register={register} error={errors.firstName} />
+                        <InputField label="Last Name" name="lastName" register={register} error={errors.lastName} />
+                        <InputField label="Phone" name="phone" register={register} error={errors.phone} />
+                        <InputField label="Address" name="address" register={register} error={errors.address} />
+                        <InputField label="Emergency Contact" name="emergencyContact" register={register} error={errors.emergencyContact} />
+                        <InputField label="Birthday" name="birthday" type="date" register={register} error={errors.birthday} />
+                        <div className="flex flex-col gap-2 w-full">
                             <label className="text-xs text-gray-500">Sex</label>
-                            <select
-                                className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full outline-none"
-                                {...register("sex")}
-                                defaultValue={data?.sex || 'male'}
-                            >
+                            <select {...register("sex")} className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full outline-none">
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                             </select>
-                            {errors.sex?.message && (
-                                <p className="text-xs text-red-400">
-                                    {errors.sex.message.toString()}
-                                </p>
-                            )}
+                            {errors.sex && <p className="text-xs text-red-400">{errors.sex.message}</p>}
                         </div>
-                        <div className="flex flex-col gap-2 w-full md:w-1/4 justify-center">
-                            <label
-                                className="text-xs text-gray-500 flex items-center gap-2 cursor-pointer"
-                                htmlFor="img"
-                            >
-                                <Image src="/upload.png" alt="" width={28} height={28} />
-                                <span>Upload a photo</span>
-                            </label>
-                            <input type="file" id="img" {...register("img")} className="hidden" />
-                            {errors.img?.message && (
-                                <p className="text-xs text-red-400">
-                                    {errors.img.message.toString()}
-                                </p>
-                            )}
-                        </div>
+                       
                     </div>
                     <div className="flex justify-between">
-                        <button type="button" onClick={prevStep} className="border  text-gray-600 p-2 px-4 rounded-md">
+                        <button type="button" onClick={prevStep} className="border text-gray-600 p-2 px-4 rounded-md">
                             Previous
                         </button>
                         <button type="button" onClick={nextStep} className="bg-[#018abd] text-white p-2 px-4 rounded-md">
@@ -285,7 +203,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
                             Previous
                         </button>
                         <button type="submit" className="bg-[#018abd] text-white p-2 rounded-md">
-                            {type === "create" ? "Create" : "Update"}
+                            Update
                         </button>
                     </div>
                 </>
@@ -294,4 +212,4 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
     );
 };
 
-export default TeacherForm;
+export default EditTeacherForm;

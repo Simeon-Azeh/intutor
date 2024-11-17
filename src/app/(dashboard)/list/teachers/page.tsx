@@ -1,3 +1,5 @@
+"use client"
+
 import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
@@ -7,7 +9,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { IoFilterCircleOutline } from "react-icons/io5";
 import { LuEye } from "react-icons/lu";
-import { RiDeleteBinLine } from "react-icons/ri";
+import { RiDeleteBinLine, RiEdit2Line } from "react-icons/ri"; // Import the edit icon
+import { useState } from "react";
+import EditTeacherForm, { Inputs } from "@/components/forms/EditTeacherForm";
+import { X, UserPen } from 'lucide-react';
 
 type Teacher = {
     id: number;
@@ -58,6 +63,20 @@ const columns = [
 ];
 
 const TeacherListPage = () => {
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
+
+    const handleEditClick = (teacher: Teacher) => {
+        setSelectedTeacher(teacher);
+        setIsEditModalOpen(true);
+    };
+
+    const handleEditSubmit = (data: Inputs) => {
+        // Handle form submission
+        console.log("Updated data:", data);
+        setIsEditModalOpen(false);
+    };
+
     const renderRow = (item: Teacher) => (
         <tr
             key={item.id}
@@ -86,16 +105,23 @@ const TeacherListPage = () => {
                     <Link href={`/list/teachers/${item.id}`}>
                         <button 
                         type="button"
-                        title={`button`} // Add title for accessibility
-                        className="w-7 h-7 flex items-center justify-center rounded-full bg-yellow-50 text='#333">
+                        title={`View ${item.name}`} // Add title for accessibility
+                        className="w-7 h-7 flex items-center justify-center rounded-full text-gray-600">
                         <LuEye size={18} />
                         </button>
                     </Link>
                     {role === "admin" && (
-                        // <button className="w-7 h-7 flex items-center justify-center rounded-full bg-red-50">
-                        // <RiDeleteBinLine />
-                        // </button>
-                        <FormModal table="teacher" type="delete" id={item.id} />
+                        <>
+                            <button 
+                                type="button"
+                                title={`Edit ${item.name}`} // Add title for accessibility
+                                className="w-7 h-7 flex items-center justify-center rounded-full text-gray-700"
+                                onClick={() => handleEditClick(item)}
+                            >
+                                <UserPen size={18} />
+                            </button>
+                            <FormModal table="teacher" type="delete" id={item.id} />
+                        </>
                     )}
                 </div>
             </td>
@@ -112,20 +138,17 @@ const TeacherListPage = () => {
                     <div className="flex items-center gap-4 self-end">
                         <button 
                         type="button"
-                        title="button"
-                        className="w-8 h-8 flex items-center justify-center rounded-full   bg-yellow-50">
+                        title="Filter"
+                        className="w-8 h-8 flex items-center justify-center rounded-full">
                         <IoFilterCircleOutline size={24} />
                         </button>
                         <button
                         type="button"
-                        title="button"
-                         className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow-50">
+                        title="Sort"
+                         className="w-8 h-8 flex items-center justify-center rounded-full">
                             <Image src="/sort.png" alt="" width={14} height={14} />
                         </button>
                         {role === "admin" && (
-                            // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-[#e77813]">
-                            //   <Image src="/plus.png" alt="" width={14} height={14} />
-                            // </button>
                             <FormModal table="teacher" type="create" />
                         )}
                     </div>
@@ -135,6 +158,23 @@ const TeacherListPage = () => {
             <Table columns={columns} renderRow={renderRow} data={teachersData} />
             {/* PAGINATION */}
             <Pagination />
+
+            {/* EDIT MODAL */}
+            {isEditModalOpen && selectedTeacher && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-4 rounded-md w-full max-w-lg relative">
+                        <EditTeacherForm data={selectedTeacher} onSubmit={handleEditSubmit} />
+                        <button
+                        title="close"
+                            type="button"
+                            className=" absolute top-2 right-4 text-gray-600"
+                            onClick={() => setIsEditModalOpen(false)}
+                        >
+                           <X />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
