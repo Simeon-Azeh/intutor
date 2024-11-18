@@ -185,3 +185,7 @@ body {
   100% { transform: rotate(360deg); }
 }
 
+
+.progress-bar-custom {
+  height: 4px; /* Adjust the height as needed */
+}
