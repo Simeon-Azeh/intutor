@@ -256,7 +256,7 @@ const RegistrationForm: React.FC = () => {
         {/* Loading spinner or Register button */}
         {loading ? (
           <div className="flex items-center justify-center py-3">
-            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-8 w-8"></div>
+            <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6 -mt-4"></div>
             <p className="text-[#018abd] ml-2">Registering...</p>
           </div>
         ) : (

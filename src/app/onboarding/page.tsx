@@ -69,6 +69,7 @@ const MultiStepOnboarding: React.FC = () => {
   });
   const [userName, setUserName] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false); 
 
   useEffect(() => {
     const checkAuthAndOnboarding = async () => {
@@ -151,6 +152,7 @@ const MultiStepOnboarding: React.FC = () => {
     }
   };
   const completeOnboarding = async () => {
+    setLoading(true);
     const uid = auth.currentUser?.uid;
     if (uid) {
       const userDocRef = doc(db, "users", uid);
@@ -159,6 +161,7 @@ const MultiStepOnboarding: React.FC = () => {
       await setDoc(userDocRef, { ...userData, ...schoolInfo, onboardingComplete: true }, { merge: true });
       router.push("/admin");
     }
+    setLoading(false);
   };
 
   return (
@@ -281,7 +284,9 @@ const MultiStepOnboarding: React.FC = () => {
      </div>
      
     </div>
-    <label htmlFor="Logo" className="block text-sm font-medium mb-2 text-gray-700">
+    <div className="grid grid-cols-1  md:grid-cols-2 gap-4">
+          <div>
+          <label htmlFor="Logo" className="block text-sm font-medium mb-2 text-gray-700">
       Upload School Logo (optional)
     </label>
     <div className="relative w-full border border-gray-300 p-4 rounded-lg mb-4">
@@ -298,6 +303,28 @@ const MultiStepOnboarding: React.FC = () => {
         <span className="text-gray-500">Choose a file...</span>
       </div>
     </div>
+          </div>
+          <div>
+          <label htmlFor="Logo" className="block text-sm font-medium mb-2 text-gray-700">
+      Upload ID  (Passport, Driver's License etc)
+    </label>
+    <div className="relative w-full border border-gray-300 p-4 rounded-lg mb-4">
+      <input
+        title="logoupload"
+        type="file"
+        name="fileID"
+        id="fileID"
+        onChange={handleFileChange}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      />
+      <div className="flex items-center justify-center h-full text-gray-500 gap-1">
+        <ImageUp size={18} />
+        <span className="text-gray-500">Choose Document...</span>
+      </div>
+    </div>
+          </div>
+    </div>
+   
     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
       <div>
       <input
@@ -534,23 +561,33 @@ const MultiStepOnboarding: React.FC = () => {
       </button>
     </div>
   </div>
-)}
+)}                                                                                                                                                                                                                                                                                                                                                                                                         
 
-        {step === 4 && (
-        <div className="">
-          <h1 className="text-lg font-medium mb-4">Hurray!!! <span className="text-[#018abd]">{userName}</span>, you've succesfully completed onboarding!</h1>
-          <p className="mb-4">We're excited to help you manage your school records efficiently, you would now have access to most features. Within a few days, our team will notify you if your school has been approved</p>
-          <p>Have an ostastic day!</p>
-          <div className="flex justify-center mb-4">
-            <Image src="/Hello.gif" alt="Welcome" width={350} height={150} />
-          </div>
-          <div className="flex gap-2">
-            <button className="w-full bg-[#018abd] text-white py-3 px-4 rounded-lg mt-4" onClick={completeOnboarding}>
-              Complete Onboarding
-            </button>
-          </div>
-        </div>
+{step === 4 && (
+  <div className="">
+    <h1 className="text-lg font-medium mb-4">Hurray!!! <span className="text-[#018abd]">{userName}</span>, you've successfully completed onboarding!</h1>
+    <p className="mb-4">We're excited to help you manage your school records efficiently. You will now have access to most features. Within a few days, our team will notify you if your school has been approved.</p>
+    <p>Have an ostastic day!</p>
+    <div className="flex justify-center mb-4">
+      <Image src="/Onboarding.gif" alt="Welcome" width={350} height={150} />
+    </div>
+    <div className="flex gap-2">
+      <button className="w-full bg-[#018abd] text-white py-3 px-4 rounded-lg mt-4" onClick={completeOnboarding} disabled={loading}>
+        {loading ? (
+          <>
+            <svg className="animate-spin h-5 w-5 mr-3 text-white" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Your dashboard is being customized, it may take up to a minute...</span>
+          </>
+        ) : (
+          "Complete Onboarding"
         )}
+      </button>
+    </div>
+  </div>
+)}
 </motion.div>
 </div>
 </div>
