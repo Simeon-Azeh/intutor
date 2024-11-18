@@ -3,7 +3,9 @@
 import Footer from "@/components/footer";
 import dynamic from "next/dynamic";
 import Header from "@/components/Header";
-import Link from "next/link";
+import RegistrationForm from "@/components/forms/SignUpForm";
+
+
 
 // Dynamic import for SignInForm to avoid router issues
 const SignInForm = dynamic(() => import("@/components/forms/SignInForm"), { ssr: false });
@@ -14,22 +16,13 @@ const SignInPage = () => {
       <div className="top-0 sticky">
         <Header />
       </div>
-      <SignInForm />
-      <div className="text-center mt-4">
-        <p className="text-md font-medium text-gray-500">
-          Want to register your school?{" "}
-          <Link href="/register" className="text-[#018abd]">
-            Register here
-          </Link>
-        </p>
-      </div>
+      <RegistrationForm />
       <div className="pb-4">
         <p className="text-center text-md font-medium text-gray-500">
           &copy; {new Date().getFullYear()} Intutor. All Rights Reserved •{" "}
-          <a href="">Privacy Policy</a>
+          <a href="">Terms and Condition</a>
         </p>
       </div>
-    
     </main>
   );
 };
