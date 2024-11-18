@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Announcements from "@/components/Announcement";
 import AttendanceChart from "@/components/AttendanceChart";
 import CountChart from "@/components/CountChart";
@@ -9,9 +9,70 @@ import FinanceChart from "@/components/FinanceChart";
 import UserCard from "@/components/UserCard";
 import Joyride from "react-joyride";
 import Greetings from "@/components/Greetings"; // Import Greetings component
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/firebase/firebaseConfig"; // Adjust the import path as needed
+import { useRouter } from "next/navigation";
+
+interface User {
+  id: string;
+  name: string;
+  role: string;
+  email: string;
+  school: string;
+  // Add other fields as needed
+}
 
 const AdminPage = () => {
   const [runTour, setRunTour] = useState(true);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+   const [studentCount, setStudentCount] = useState(0);
+  const [teacherCount, setTeacherCount] = useState(0);
+  const [parentCount, setParentCount] = useState(0);
+  const [staffCount, setStaffCount] = useState(0);
+  const router = useRouter();
+
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const uid = auth.currentUser?.uid;
+        if (!uid) {
+          router.push("/signin");
+          return;
+        }
+
+        const userDocRef = doc(db, "users", uid);
+        const userDoc = await getDoc(userDocRef);
+        const userData = userDoc.data();
+        const userSchool = userData?.school;
+
+        const q = query(collection(db, "users"), where("school", "==", userSchool));
+        const querySnapshot = await getDocs(q);
+        const usersList: User[] = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+
+        setUsers(usersList);
+
+        // Calculate counts for each role
+        const studentCount = usersList.filter(user => user.role === "student").length;
+        const teacherCount = usersList.filter(user => user.role === "teacher").length;
+        const parentCount = usersList.filter(user => user.role === "parent").length;
+        const staffCount = usersList.filter(user => user.role === "Admin").length;
+
+        setStudentCount(studentCount);
+        setTeacherCount(teacherCount);
+        setParentCount(parentCount);
+        setStaffCount(staffCount);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+    fetchUsers();
+  }, [router]);
 
   const steps = [
     {
@@ -73,11 +134,18 @@ const AdminPage = () => {
 
         {/* USER CARDS */}
         <div className="user-cards flex gap-4 justify-between flex-wrap">
-          <UserCard type="student" />
-          <UserCard type="teacher" />
-          <UserCard type="parent" />
-          <UserCard type="staff" />
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <>
+              <UserCard type="student" count={studentCount} />
+              <UserCard type="teacher" count={teacherCount} />
+              <UserCard type="parent" count={parentCount} />
+              <UserCard type="staff" count={staffCount} />
+            </>
+          )}
         </div>
+
 
         {/* MIDDLE CHARTS */}
         <div className="flex gap-4 flex-col lg:flex-row">
