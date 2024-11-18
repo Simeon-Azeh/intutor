@@ -59,26 +59,26 @@ const RegistrationForm: React.FC = () => {
       setError("Please fill in all fields and select a valid role.");
       return;
     }
-
+  
     if (role !== "Admin") {
       setError("Only admins can create accounts. Please contact your admin.");
       return;
     }
-
+  
     if (!termsAccepted) {
       setError("You must accept the terms and conditions and fair use policy.");
       return;
     }
-
+  
     setLoading(true);
     try {
       // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
-
+  
       // Send email verification
       await sendEmailVerification(userCredential.user);
-
+  
       // Save user data to Firestore
       const userDocRef = doc(db, "users", uid);
       await setDoc(userDocRef, {
@@ -86,8 +86,9 @@ const RegistrationForm: React.FC = () => {
         email,
         role,
         school: customSchool || school,
+        onboardingComplete: false, // Add this field
       });
-
+  
       setSuccessMessage("Account created successfully! Please check your email to verify your account before continuing to onboard.");
       setError("");
     } catch (error) {
@@ -106,7 +107,6 @@ const RegistrationForm: React.FC = () => {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center py-8">
       <div className="bg-white rounded-lg p-8 w-full max-w-xl focus:shadow-xl">

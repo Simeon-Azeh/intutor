@@ -38,7 +38,7 @@ const SignInForm: React.FC = () => {
       setError("Please fill in all fields and select a valid role.");
       return;
     }
-
+  
     setLoading(true); // Start loading
     try {
       // Sign in the user with email and password
@@ -47,31 +47,37 @@ const SignInForm: React.FC = () => {
       // Get the logged-in user's UID
       const uid = userCredential.user.uid;
   
-      // Fetch the user's role from Firestore
+      // Fetch the user's role and onboarding status from Firestore
       const userDocRef = doc(db, "users", uid);  // Assuming your collection is called "users"
       const userDoc = await getDoc(userDocRef);
-      
   
       if (userDoc.exists()) {
         const userData = userDoc.data();
         const userRole = userData?.role; // This is the role of the user
-
+        const onboardingComplete = userData?.onboardingComplete;
+  
         // Validate that the role matches
         if (userRole !== role) {
           setError("The selected role doesn't match your account role.");
           setLoading(false);
           return;
         }
-
+  
         // Set redirecting state to show message
         setRedirecting(true);
-
+  
+        // Redirect based on onboarding status
+        if (!onboardingComplete) {
+          router.push("/onboarding");
+          return;
+        }
+  
         // Redirect based on role
         switch (userRole) {
           case "Admin":
             router.push("/admin");
             break;
-          case "Peacher":
+          case "Teacher":
             router.push("/teacher");
             break;
           case "Parent":
