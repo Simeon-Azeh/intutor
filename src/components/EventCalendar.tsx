@@ -262,10 +262,10 @@ const EventCalendar = () => {
         ) : (
           events.map((event) => (
             <div
-              className="p-4 rounded-lg shadow-md border border-[#018abd] cursor-pointer bg-white relative transition-transform transform hover:scale-105 hover:shadow-lg"
-              key={event.id}
-              onClick={() => handleEventSelection(event)}
-            >
+    className={`p-4 rounded-lg shadow-md border border-[#018abd] cursor-pointer bg-white relative transition-transform transform hover:scale-105 hover:shadow-lg ${userRole !== "Admin" ? "pointer-events-none" : ""}`}
+    key={event.id}
+    onClick={userRole === "Admin" ? () => handleEventSelection(event) : undefined}
+  >
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-gray-600">{event.title}</h2>
                 <span className="text-xs text-gray-400">{event.time}</span>
