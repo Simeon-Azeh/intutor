@@ -1,28 +1,29 @@
-"use client"
+"use client";
 
 import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
-import { role, teachersData } from "@/lib/data";
+import { auth, db } from "@/firebase/firebaseConfig";
 import Image from "next/image";
 import Link from "next/link";
 import { IoFilterCircleOutline } from "react-icons/io5";
 import { LuEye } from "react-icons/lu";
-import { RiDeleteBinLine, RiEdit2Line } from "react-icons/ri"; // Import the edit icon
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EditTeacherForm, { Inputs } from "@/components/forms/EditTeacherForm";
 import { X, UserPen } from 'lucide-react';
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 type Teacher = {
-    id: number;
+    id: string;
     teacherId: string;
     name: string;
     email?: string;
     photo: string;
     phone: string;
-    subjects: string[];
-    classes: string[];
+    subjectsTaught: string[]; // Update field name
+    classesAssigned: string[]; // Update field name
     address: string;
 };
 
@@ -38,12 +39,12 @@ const columns = [
     },
     {
         header: "Subjects",
-        accessor: "subjects",
+        accessor: "subjectsTaught", // Update field name
         className: "hidden md:table-cell",
     },
     {
         header: "Classes",
-        accessor: "classes",
+        accessor: "classesAssigned", // Update field name
         className: "hidden md:table-cell",
     },
     {
@@ -65,6 +66,46 @@ const columns = [
 const TeacherListPage = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
+    const [teachers, setTeachers] = useState<Teacher[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [userRole, setUserRole] = useState<string | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchTeachers = async () => {
+            try {
+                const uid = auth.currentUser?.uid;
+                if (!uid) {
+                    router.push("/signin");
+                    return;
+                }
+
+                const userDocRef = doc(db, "users", uid);
+                const userDoc = await getDoc(userDocRef);
+                const userData = userDoc.data();
+                const userSchool = userData?.school;
+                setUserRole(userData?.role || null);
+
+                const q = query(collection(db, "teachers"), where("school", "==", userSchool));
+                const querySnapshot = await getDocs(q);
+                const teachersList: Teacher[] = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                    subjectsTaught: doc.data().subjectsTaught || [], // Provide default value
+                    classesAssigned: doc.data().classesAssigned || [], // Provide default value
+                    photo: "https://via.placeholder.com/150" // Placeholder image
+                } as Teacher));
+
+                setTeachers(teachersList);
+            } catch (error) {
+                console.error("Error fetching teachers:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTeachers();
+    }, [router]);
 
     const handleEditClick = (teacher: Teacher) => {
         setSelectedTeacher(teacher);
@@ -96,8 +137,8 @@ const TeacherListPage = () => {
                 </div>
             </td>
             <td className="hidden md:table-cell">{item.teacherId}</td>
-            <td className="hidden md:table-cell">{item.subjects.join(",")}</td>
-            <td className="hidden md:table-cell">{item.classes.join(",")}</td>
+            <td className="hidden md:table-cell">{item.subjectsTaught.join(",")}</td> {/* Update field name */}
+            <td className="hidden md:table-cell">{item.classesAssigned.join(",")}</td> {/* Update field name */}
             <td className="hidden md:table-cell">{item.phone}</td>
             <td className="hidden md:table-cell">{item.address}</td>
             <td>
@@ -110,7 +151,7 @@ const TeacherListPage = () => {
                         <LuEye size={18} />
                         </button>
                     </Link>
-                    {role === "admin" && (
+                    {userRole === "Admin" && (
                         <>
                             <button 
                                 type="button"
@@ -148,14 +189,18 @@ const TeacherListPage = () => {
                          className="w-8 h-8 flex items-center justify-center rounded-full">
                             <Image src="/sort.png" alt="" width={14} height={14} />
                         </button>
-                        {role === "admin" && (
+                        {userRole === "Admin" && (
                             <FormModal table="teacher" type="create" />
                         )}
                     </div>
                 </div>
             </div>
             {/* LIST */}
-            <Table columns={columns} renderRow={renderRow} data={teachersData} />
+            {loading ? (
+                <p>Loading...</p>
+            ) : (
+                <Table columns={columns} renderRow={renderRow} data={teachers} />
+            )}
             {/* PAGINATION */}
             <Pagination />
 
