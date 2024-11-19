@@ -5,8 +5,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import React, { useState } from 'react';
 import InputField from "../InputField";
-import Image from "next/image";
 import { UserRoundPen, UserRound } from 'lucide-react';
+import { auth, db } from "../../firebase/firebaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 const schema = z.object({
     username: z
@@ -22,9 +24,8 @@ const schema = z.object({
     phone: z.string().min(1, { message: "Phone is required!" }),
     address: z.string().min(1, { message: "Address is required!" }),
     emergencyContact: z.string().min(1, { message: "Emergency contact is required!" }),
-    birthday: z.date({ message: "Birthday is required!" }),
+    birthday: z.string().refine(val => !isNaN(Date.parse(val)), { message: "Birthday is required!" }),
     sex: z.enum(["male", "female"], { message: "Sex is required!" }),
-    img: z.instanceof(File, { message: "Image is required" }),
     subjectsTaught: z.array(z.string()).min(1, { message: "At least one subject must be selected!" }),
     classesAssigned: z.array(z.string()).min(1, { message: "At least one class must be selected!" }),
 });
@@ -70,9 +71,8 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
             phone: data?.phone || '',
             address: data?.address || '',
             emergencyContact: data?.emergencyContact || '',
-            birthday: data?.birthday ? new Date(data.birthday) : undefined,
+            birthday: data?.birthday ? new Date(data.birthday).toISOString().split('T')[0] : '',
             sex: data?.sex || 'male',
-            img: data?.img || undefined,
             subjectsTaught: data?.subjectsTaught || [],
             classesAssigned: data?.classesAssigned || []
         }
@@ -81,6 +81,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
     const [selectedSubjects, setSelectedSubjects] = useState<string[]>(data?.subjectsTaught || []);
     const [selectedClasses, setSelectedClasses] = useState<string[]>(data?.classesAssigned || []);
     const [step, setStep] = useState(1);
+    const [loading, setLoading] = useState(false);
 
     const handleSubjectClick = (subject: string) => {
         let updatedSubjects;
@@ -104,8 +105,58 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
         setValue("classesAssigned", updatedClasses);
     };
 
-    const onSubmit = (formData: Inputs) => {
-        // Handle form submission
+    const onSubmit = async (formData: Inputs) => {
+        setLoading(true);
+        try {
+            const uid = auth.currentUser?.uid;
+            if (!uid) {
+                console.error("No user is logged in");
+                setLoading(false);
+                return;
+            }
+
+            const userDocRef = doc(db, "users", uid);
+            const userDoc = await getDoc(userDocRef);
+            if (!userDoc.exists()) {
+                console.error("User document not found");
+                setLoading(false);
+                return;
+            }
+
+            const userData = userDoc.data();
+            const schoolName = userData?.school;
+            if (!schoolName) {
+                console.error("School name not found in user document");
+                setLoading(false);
+                return;
+            }
+
+            const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+            const newUser = userCredential.user;
+
+            await setDoc(doc(db, "users", newUser.uid), {
+                username: formData.username,
+                email: formData.email,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                phone: formData.phone,
+                address: formData.address,
+                emergencyContact: formData.emergencyContact,
+                birthday: new Date(formData.birthday),
+                sex: formData.sex,
+                subjectsTaught: formData.subjectsTaught,
+                classesAssigned: formData.classesAssigned,
+                school: schoolName,
+                role: "teacher"
+            });
+
+            // Handle success (e.g., show a success message, redirect, etc.)
+        } catch (error) {
+            console.error("Error creating teacher:", error);
+            // Handle error (e.g., show an error message)
+        } finally {
+            setLoading(false);
+        }
     };
 
     const nextStep = () => setStep(prev => prev + 1);
@@ -214,21 +265,6 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
                                 </p>
                             )}
                         </div>
-                        <div className="flex flex-col gap-2 w-full md:w-1/4 justify-center">
-                            <label
-                                className="text-xs text-gray-500 flex items-center gap-2 cursor-pointer"
-                                htmlFor="img"
-                            >
-                                <Image src="/upload.png" alt="" width={28} height={28} />
-                                <span>Upload a photo</span>
-                            </label>
-                            <input type="file" id="img" {...register("img")} className="hidden" />
-                            {errors.img?.message && (
-                                <p className="text-xs text-red-400">
-                                    {errors.img.message.toString()}
-                                </p>
-                            )}
-                        </div>
                     </div>
                     <div className="flex justify-between">
                         <button type="button" onClick={prevStep} className="border  text-gray-600 p-2 px-4 rounded-md">
@@ -284,8 +320,8 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
                         <button type="button" onClick={prevStep} className="bg-gray-500 text-white p-2 rounded-md">
                             Previous
                         </button>
-                        <button type="submit" className="bg-[#018abd] text-white p-2 rounded-md">
-                            {type === "create" ? "Create" : "Update"}
+                        <button type="submit" className="bg-[#018abd] text-white p-2 rounded-md" disabled={loading}>
+                            {loading ? "Creating..." : (type === "create" ? "Create" : "Update")}
                         </button>
                     </div>
                 </>
