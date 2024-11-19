@@ -17,6 +17,7 @@ import { db, auth } from "../firebase/firebaseConfig";
 import { collection, query, where, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 
 const EventCalendar = () => {
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [value, setValue] = useState<Date | [Date, Date] | null>(new Date());
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,17 +30,40 @@ const EventCalendar = () => {
     time: "",
     description: "",
   });
+  const [loadingAdd, setLoadingAdd] = useState(false);
+  const [loadingEdit, setLoadingEdit] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
-  const fetchEvents = async () => {
+  const fetchUserRole = async () => {
     try {
-      // Get the currently logged-in user's UID
       const uid = auth.currentUser?.uid;
       if (!uid) {
         console.error("No user is logged in");
         return;
       }
 
-      // Fetch the admin's school information from Firestore
+      const userDocRef = doc(db, "users", uid);
+      const userDoc = await getDoc(userDocRef);
+      if (!userDoc.exists()) {
+        console.error("User document not found");
+        return;
+      }
+
+      const userData = userDoc.data();
+      setUserRole(userData?.role || null);
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+    }
+  };
+
+  const fetchEvents = async () => {
+    try {
+      const uid = auth.currentUser?.uid;
+      if (!uid) {
+        console.error("No user is logged in");
+        return;
+      }
+
       const userDocRef = doc(db, "users", uid);
       const userDoc = await getDoc(userDocRef);
       if (!userDoc.exists()) {
@@ -54,11 +78,9 @@ const EventCalendar = () => {
         return;
       }
 
-      // Query Firestore to get events from the specific school
       const q = query(collection(db, "events"), where("school", "==", schoolName));
       const querySnapshot = await getDocs(q);
 
-      // Map events from Firestore
       const eventsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setEvents(eventsList);
     } catch (error) {
@@ -67,6 +89,7 @@ const EventCalendar = () => {
   };
 
   useEffect(() => {
+    fetchUserRole();
     fetchEvents();
   }, []);
 
@@ -115,15 +138,18 @@ const EventCalendar = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (modalAction === "Add Event") {
+      setLoadingAdd(true);
+    } else if (modalAction === "Edit Event") {
+      setLoadingEdit(true);
+    }
     try {
-      // Get the currently logged-in user's UID
       const uid = auth.currentUser?.uid;
       if (!uid) {
         console.error("No user is logged in");
         return;
       }
 
-      // Fetch the admin's school information from Firestore
       const userDocRef = doc(db, "users", uid);
       const userDoc = await getDoc(userDocRef);
       if (!userDoc.exists()) {
@@ -139,13 +165,11 @@ const EventCalendar = () => {
       }
 
       if (modalAction === "Add Event") {
-        // Add the new event to Firestore
         await addDoc(collection(db, "events"), {
           ...newEvent,
           school: schoolName,
         });
       } else if (modalAction === "Edit Event" && selectedEvent) {
-        // Update the existing event in Firestore
         const eventDocRef = doc(db, "events", selectedEvent.id);
         await updateDoc(eventDocRef, {
           ...newEvent,
@@ -153,33 +177,35 @@ const EventCalendar = () => {
         });
       }
 
-      // Close the modal and refresh events
       closeModal();
       fetchEvents();
     } catch (error) {
       console.error("Error adding/updating event:", error);
+    } finally {
+      setLoadingAdd(false);
+      setLoadingEdit(false);
     }
   };
 
   const handleDelete = async () => {
+    setLoadingDelete(true);
     try {
       if (selectedEvent) {
-        // Delete the event from Firestore
         const eventDocRef = doc(db, "events", selectedEvent.id);
         await deleteDoc(eventDocRef);
 
-        // Close the modal and refresh events
         closeModal();
         fetchEvents();
       }
     } catch (error) {
       console.error("Error deleting event:", error);
+    } finally {
+      setLoadingDelete(false);
     }
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md relative">
-      {/* Styled Calendar */}
       <Calendar
         value={value}
         className="custom-calendar"
@@ -194,42 +220,44 @@ const EventCalendar = () => {
         nextLabel={<FiChevronRight className="text-gray-500" size={20} />}
       />
 
-      {/* Events Header */}
       <div className="flex items-center justify-between mt-6">
         <h1 className="text-xl font-semibold text-gray-700">Events</h1>
-        <div className="relative">
-          {/* Dropdown Trigger */}
-          <FiMoreVertical
-            className="text-gray-500 cursor-pointer"
-            size={24}
-            onClick={toggleDropdown}
-          />
-          {/* Dropdown Menu */}
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-              <button
-                className="flex items-center w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
-                onClick={() => handleAction("Add Event")}
-              >
-                <FiPlus className="mr-2" /> Add Event
-              </button>
-            </div>
-          )}
-        </div>
+        {userRole === "Admin" && (
+          <div className="relative">
+            <FiMoreVertical
+              className="text-gray-500 cursor-pointer"
+              size={24}
+              onClick={toggleDropdown}
+            />
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                <button
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+                  onClick={() => handleAction("Add Event")}
+                  disabled={loadingAdd}
+                >
+                  {loadingAdd ? <div className="loaderAlt"></div> : <FiPlus className="mr-2" />} Add Event
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Events List */}
       <div className="mt-4 space-y-4">
         {events.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64">
             <CalendarOff size={48} className="text-gray-400" />
             <p className="text-gray-500 mt-4">No events available</p>
-            <button
-              className="mt-4 bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
-              onClick={() => handleAction("Add Event")}
-            >
-              Create First Event
-            </button>
+            {userRole === "Admin" && (
+              <button
+                className="mt-4 bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
+                onClick={() => handleAction("Add Event")}
+                disabled={loadingAdd}
+              >
+                {loadingAdd ? <div className="loaderAlt"></div> : "Create First Event"}
+              </button>
+            )}
           </div>
         ) : (
           events.map((event) => (
@@ -249,7 +277,6 @@ const EventCalendar = () => {
         )}
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-20">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
@@ -262,7 +289,6 @@ const EventCalendar = () => {
                   Fill out the form to add a new event.
                 </p>
                 <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
-                  {/* Add Event Form */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Event Title
@@ -327,14 +353,16 @@ const EventCalendar = () => {
                       type="button"
                       className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition duration-200"
                       onClick={closeModal}
+                      disabled={loadingAdd || loadingEdit}
                     >
-                      Cancel
+                      {loadingAdd || loadingEdit ? <div className="loader"></div> : "Cancel"}
                     </button>
                     <button
                       type="submit"
                       className="bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
+                      disabled={loadingAdd || loadingEdit}
                     >
-                      Save Changes
+                      {loadingAdd || loadingEdit ? <div className="loaderAlt"></div> : "Save Changes"}
                     </button>
                   </div>
                 </form>
@@ -346,7 +374,6 @@ const EventCalendar = () => {
                   Edit the form to update the event.
                 </p>
                 <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
-                  {/* Edit Event Form */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Event Title
@@ -411,14 +438,16 @@ const EventCalendar = () => {
                       type="button"
                       className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition duration-200"
                       onClick={closeModal}
+                      disabled={loadingAdd || loadingEdit}
                     >
-                      Cancel
+                      {loadingAdd || loadingEdit ? <div className="loader"></div> : "Cancel"}
                     </button>
                     <button
                       type="submit"
                       className="bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
+                      disabled={loadingAdd || loadingEdit}
                     >
-                      Save Changes
+                      {loadingAdd || loadingEdit ? <div className="loaderAlt"></div> : "Save Changes"}
                     </button>
                   </div>
                 </form>
@@ -427,8 +456,9 @@ const EventCalendar = () => {
                     type="button"
                     className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
                     onClick={handleDelete}
+                    disabled={loadingDelete}
                   >
-                    Delete Event
+                    {loadingDelete ? <div className="loaderAlt"></div> : "Delete Event"}
                   </button>
                 </div>
               </>
@@ -436,8 +466,9 @@ const EventCalendar = () => {
             <button
               className="absolute top-2 right-2 text-gray-500"
               onClick={closeModal}
+              disabled={loadingAdd || loadingEdit}
             >
-              Close
+              {loadingAdd || loadingEdit ? <div className="loaderAlt"></div> : "Close"}
             </button>
           </div>
         </div>

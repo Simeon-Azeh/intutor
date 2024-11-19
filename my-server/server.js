@@ -1,9 +1,18 @@
 const express = require('express');
 const admin = require('firebase-admin');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const app = express();
 app.use(bodyParser.json());
+
+// Configure CORS to allow requests from specific origins
+const corsOptions = {
+    origin: 'http://localhost:3000', // Replace with your frontend URL
+    optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions)); // Enable CORS for all routes with specific options
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({

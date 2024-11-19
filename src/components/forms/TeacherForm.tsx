@@ -105,7 +105,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
     const onSubmit = async (formData: Inputs) => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/create-teacher', { // Replace with your server URL
+            const response = await fetch('https://<region>-<project-id>.cloudfunctions.net/createTeacher', { // Replace with your Firebase Function URL
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -126,7 +126,6 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
             setLoading(false);
         }
     };
-
     const nextStep = () => setStep(prev => prev + 1);
     const prevStep = () => setStep(prev => prev - 1);
 
