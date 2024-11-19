@@ -15,7 +15,7 @@ type Lesson = {
 const columns = [
   {
     header: "Subject Name",
-    accessor: "name",
+    accessor: "subject",
   },
   {
     header: "Class",
@@ -46,7 +46,7 @@ const LessonListPage = () => {
           {role === "admin" && (
             <>
               <FormModal table="lesson" type="update" data={item} />
-              <FormModal table="lesson" type="delete" id={item.id} />
+              <FormModal table="lesson" type="delete" id={item.id.toString()} /> {/* Convert id to string */}
             </>
           )}
         </div>
@@ -63,15 +63,17 @@ const LessonListPage = () => {
           <TableSearch />
           <div className="flex items-center gap-4 self-end">
             <button
-            type="button"
-            title="button"
-             className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-50">
+              type="button"
+              title="button"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-50"
+            >
               <Image src="/filter.png" alt="" width={14} height={14} />
             </button>
             <button
-             type="button"
-            title="button"
-             className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-50">
+              type="button"
+              title="button"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-50"
+            >
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
             {role === "admin" && <FormModal table="lesson" type="create" />}

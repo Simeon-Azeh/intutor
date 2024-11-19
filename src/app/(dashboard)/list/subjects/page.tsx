@@ -40,7 +40,7 @@ const SubjectListPage = () => {
           {role === "admin" && (
             <>
               <FormModal table="subject" type="update" data={item} />
-              <FormModal table="subject" type="delete" id={item.id} />
+              <FormModal table="subject" type="delete" id={item.id.toString()} /> 
             </>
           )}
         </div>
@@ -56,19 +56,21 @@ const SubjectListPage = () => {
         <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
           <TableSearch />
           <div className="flex items-center gap-4 self-end">
-        <button
-        type="button"
-        title="button"
-             className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-50">
+            <button
+              type="button"
+              title="button"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-50"
+            >
               <Image src="/filter.png" alt="" width={14} height={14} />
             </button>
             <button
-            type="button"
-        title="button"
-             className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-50">
+              type="button"
+              title="button"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-50"
+            >
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="teacher" type="create" />}
+            {role === "admin" && <FormModal table="subject" type="create" />}
           </div>
         </div>
       </div>
