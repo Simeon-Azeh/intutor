@@ -26,12 +26,11 @@ const AdminPage = () => {
   const [runTour, setRunTour] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-   const [studentCount, setStudentCount] = useState(0);
+  const [studentCount, setStudentCount] = useState(0);
   const [teacherCount, setTeacherCount] = useState(0);
   const [parentCount, setParentCount] = useState(0);
   const [staffCount, setStaffCount] = useState(0);
   const router = useRouter();
-
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -45,6 +44,12 @@ const AdminPage = () => {
         const userDocRef = doc(db, "users", uid);
         const userDoc = await getDoc(userDocRef);
         const userData = userDoc.data();
+
+        if (userData?.role !== "Admin") {
+          router.push("/signin");
+          return;
+        }
+
         const userSchool = userData?.school;
 
         const q = query(collection(db, "users"), where("school", "==", userSchool));
@@ -54,8 +59,8 @@ const AdminPage = () => {
         setUsers(usersList);
 
         // Calculate counts for each role
-        const studentCount = usersList.filter(user => user.role === "student").length;
-        const teacherCount = usersList.filter(user => user.role === "teacher").length;
+        const studentCount = usersList.filter(user => user.role === "Student").length;
+        const teacherCount = usersList.filter(user => user.role === "Teacher").length;
         const parentCount = usersList.filter(user => user.role === "parent").length;
         const staffCount = usersList.filter(user => user.role === "Admin").length;
 
@@ -69,7 +74,6 @@ const AdminPage = () => {
         setLoading(false);
       }
     };
-
 
     fetchUsers();
   }, [router]);
@@ -145,7 +149,6 @@ const AdminPage = () => {
             </>
           )}
         </div>
-
 
         {/* MIDDLE CHARTS */}
         <div className="flex gap-4 flex-col lg:flex-row">

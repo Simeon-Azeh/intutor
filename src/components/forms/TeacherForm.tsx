@@ -3,9 +3,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import InputField from "../InputField";
 import { UserRoundPen, UserRound } from 'lucide-react';
+import { auth, db } from "../../firebase/firebaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { collection, doc, setDoc, getDoc } from "firebase/firestore";
+import Link from "next/link";
 
 const schema = z.object({
     username: z
@@ -79,6 +83,30 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
     const [selectedClasses, setSelectedClasses] = useState<string[]>(data?.classesAssigned || []);
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [school, setSchool] = useState<string | null>(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+    useEffect(() => {
+        const fetchSchool = async () => {
+            const uid = auth.currentUser?.uid;
+            if (!uid) {
+                console.error("No user is logged in");
+                return;
+            }
+
+            const userDocRef = doc(db, "users", uid);
+            const userDoc = await getDoc(userDocRef);
+            if (!userDoc.exists()) {
+                console.error("User document not found");
+                return;
+            }
+
+            const userData = userDoc.data();
+            setSchool(userData?.school || null);
+        };
+
+        fetchSchool();
+    }, []);
 
     const handleSubjectClick = (subject: string) => {
         let updatedSubjects;
@@ -105,195 +133,221 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
     const onSubmit = async (formData: Inputs) => {
         setLoading(true);
         try {
-            const response = await fetch('https://<region>-<project-id>.cloudfunctions.net/createTeacher', { // Replace with your Firebase Function URL
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-    
-            if (!response.ok) {
-                throw new Error('Failed to create teacher');
-            }
-    
-            // Handle success (e.g., show a success message, redirect, etc.)
-            console.log('Teacher created successfully');
+            const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+            const user = userCredential.user;
+
+            const teacherId = `teacher_${Date.now()}`;
+
+            const teacherData = {
+                name: formData.username,
+                email: formData.email,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                phone: formData.phone,
+                address: formData.address,
+                emergencyContact: formData.emergencyContact,
+                birthday: formData.birthday,
+                sex: formData.sex,
+                subjectsTaught: formData.subjectsTaught,
+                classesAssigned: formData.classesAssigned,
+                school: school,
+                teacherId: teacherId
+            };
+
+            await setDoc(doc(db, "teachers", user.uid), teacherData);
+            await setDoc(doc(db, "users", user.uid), { ...teacherData, role: "Teacher" });
+
+            setShowSuccessModal(true);
         } catch (error) {
             console.error('Error creating teacher:', error);
-            // Handle error (e.g., show an error message)
         } finally {
             setLoading(false);
         }
     };
+
     const nextStep = () => setStep(prev => prev + 1);
     const prevStep = () => setStep(prev => prev - 1);
 
     return (
-        <form className="flex flex-col gap-8 overflow-y-auto overflow-x-hidden" onSubmit={handleSubmit(onSubmit)}>
-            {step === 1 && (
-                <>
-                    <h1 className="text-xl font-semibold">Create a new teacher</h1>
-                    <span className="text-base text-gray-600 font-medium flex items-center gap-2">
-                    <UserRoundPen size={20}/>
-                        Authentication Information
-                    </span>
-                    <div className="flex justify-between flex-wrap gap-4">
-                        <InputField
-                            label="Username"
-                            name="username"
-                            defaultValue={data?.username}
-                            register={register}
-                            error={errors?.username}
-                        />
-                        <InputField
-                            label="Email"
-                            name="email"
-                            defaultValue={data?.email}
-                            register={register}
-                            error={errors?.email}
-                        />
-                        <InputField
-                            label="Password"
-                            name="password"
-                            type="password"
-                            defaultValue={data?.password}
-                            register={register}
-                            error={errors?.password}
-                        />
-                    </div>
-                    <button type="button" onClick={nextStep} className="bg-[#018abd] text-white p-2 rounded-md">
-                        Next
-                    </button>
-                </>
-            )}
-            {step === 2 && (
-                <>
-                    <span className="text-base text-gray-600 font-medium flex items-center gap-2">
-                    <UserRound size={20}/>  Personal Information
-                    </span>
-                    <div className="flex justify-between flex-wrap gap-4">
-                        <InputField
-                            label="First Name"
-                            name="firstName"
-                            defaultValue={data?.firstName}
-                            register={register}
-                            error={errors.firstName}
-                        />
-                        <InputField
-                            label="Last Name"
-                            name="lastName"
-                            defaultValue={data?.lastName}
-                            register={register}
-                            error={errors.lastName}
-                        />
-                        <InputField
-                            label="Phone"
-                            name="phone"
-                            defaultValue={data?.phone}
-                            register={register}
-                            error={errors.phone}
-                        />
-                        <InputField
-                            label="Address"
-                            name="address"
-                            defaultValue={data?.address}
-                            register={register}
-                            error={errors.address}
-                        />
-                        <InputField
-                            label="Emergency Contact"
-                            name="emergencyContact"
-                            defaultValue={data?.emergencyContact}
-                            register={register}
-                            error={errors.emergencyContact}
-                        />
-                        <InputField
-                            label="Birthday"
-                            name="birthday"
-                            defaultValue={data?.birthday ? new Date(data.birthday).toISOString().split('T')[0] : ''}
-                            register={register}
-                            error={errors.birthday}
-                            type="date"
-                        />
-                        <div className="flex flex-col gap-2 w-full md:w-1/4">
-                            <label className="text-xs text-gray-500">Sex</label>
-                            <select
-                                className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full outline-none"
-                                {...register("sex")}
-                                defaultValue={data?.sex || 'male'}
-                            >
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                            </select>
-                            {errors.sex?.message && (
+        <>
+            <form className="flex flex-col gap-8 overflow-y-auto overflow-x-hidden" onSubmit={handleSubmit(onSubmit)}>
+                {step === 1 && (
+                    <>
+                        <h1 className="text-xl font-semibold">Create a new teacher</h1>
+                        <span className="text-base text-gray-600 font-medium flex items-center gap-2">
+                            <UserRoundPen size={20} />
+                            Authentication Information
+                        </span>
+                        <div className="flex justify-between flex-wrap gap-4">
+                            <InputField
+                                label="Username"
+                                name="username"
+                                defaultValue={data?.username}
+                                register={register}
+                                error={errors?.username}
+                            />
+                            <InputField
+                                label="Email"
+                                name="email"
+                                defaultValue={data?.email}
+                                register={register}
+                                error={errors?.email}
+                            />
+                            <InputField
+                                label="Password"
+                                name="password"
+                                type="password"
+                                defaultValue={data?.password}
+                                register={register}
+                                error={errors?.password}
+                            />
+                        </div>
+                        <button type="button" onClick={nextStep} className="bg-[#018abd] text-white p-2 rounded-md">
+                            Next
+                        </button>
+                    </>
+                )}
+                {step === 2 && (
+                    <>
+                        <span className="text-base text-gray-600 font-medium flex items-center gap-2">
+                            <UserRound size={20} />  Personal Information
+                        </span>
+                        <div className="flex justify-between flex-wrap gap-4">
+                            <InputField
+                                label="First Name"
+                                name="firstName"
+                                defaultValue={data?.firstName}
+                                register={register}
+                                error={errors.firstName}
+                            />
+                            <InputField
+                                label="Last Name"
+                                name="lastName"
+                                defaultValue={data?.lastName}
+                                register={register}
+                                error={errors.lastName}
+                            />
+                            <InputField
+                                label="Phone"
+                                name="phone"
+                                defaultValue={data?.phone}
+                                register={register}
+                                error={errors.phone}
+                            />
+                            <InputField
+                                label="Address"
+                                name="address"
+                                defaultValue={data?.address}
+                                register={register}
+                                error={errors.address}
+                            />
+                            <InputField
+                                label="Emergency Contact"
+                                name="emergencyContact"
+                                defaultValue={data?.emergencyContact}
+                                register={register}
+                                error={errors.emergencyContact}
+                            />
+                            <InputField
+                                label="Birthday"
+                                name="birthday"
+                                defaultValue={data?.birthday ? new Date(data.birthday).toISOString().split('T')[0] : ''}
+                                register={register}
+                                error={errors.birthday}
+                                type="date"
+                            />
+                            <div className="flex flex-col gap-2 w-full md:w-1/4">
+                                <label className="text-xs text-gray-500">Sex</label>
+                                <select
+                                    className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full outline-none"
+                                    {...register("sex")}
+                                    defaultValue={data?.sex || 'male'}
+                                >
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                                {errors.sex?.message && (
+                                    <p className="text-xs text-red-400">
+                                        {errors.sex.message.toString()}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex justify-between">
+                            <button type="button" onClick={prevStep} className="border  text-gray-600 p-2 px-4 rounded-md">
+                                Previous
+                            </button>
+                            <button type="button" onClick={nextStep} className="bg-[#018abd] text-white p-2 px-4 rounded-md">
+                                Next
+                            </button>
+                        </div>
+                    </>
+                )}
+                {step === 3 && (
+                    <>
+                        <div className="flex flex-col gap-2 w-full">
+                            <label className="text-base text-gray-600 font-medium">Subjects Taught</label>
+                            <div className="flex flex-wrap gap-2">
+                                {subjects.map((subject) => (
+                                    <div
+                                        key={subject}
+                                        className={`p-2 border rounded-md cursor-pointer ${selectedSubjects.includes(subject) ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                                        onClick={() => handleSubjectClick(subject)}
+                                    >
+                                        {subject}
+                                    </div>
+                                ))}
+                            </div>
+                            {errors.subjectsTaught && (
                                 <p className="text-xs text-red-400">
-                                    {errors.sex.message.toString()}
+                                    {errors.subjectsTaught.message}
                                 </p>
                             )}
                         </div>
-                    </div>
-                    <div className="flex justify-between">
-                        <button type="button" onClick={prevStep} className="border  text-gray-600 p-2 px-4 rounded-md">
-                            Previous
-                        </button>
-                        <button type="button" onClick={nextStep} className="bg-[#018abd] text-white p-2 px-4 rounded-md">
-                            Next
-                        </button>
-                    </div>
-                </>
-            )}
-            {step === 3 && (
-                <>
-                    <div className="flex flex-col gap-2 w-full">
-                        <label className="text-base text-gray-600 font-medium">Subjects Taught</label>
-                        <div className="flex flex-wrap gap-2">
-                            {subjects.map((subject) => (
-                                <div
-                                    key={subject}
-                                    className={`p-2 border rounded-md cursor-pointer ${selectedSubjects.includes(subject) ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                                    onClick={() => handleSubjectClick(subject)}
-                                >
-                                    {subject}
-                                </div>
-                            ))}
+                        <div className="flex flex-col gap-2 w-full">
+                            <label className="text-base text-gray-600 font-medium">Assign to Class</label>
+                            <div className="flex flex-wrap gap-2">
+                                {classes.map((className) => (
+                                    <div
+                                        key={className}
+                                        className={`p-2 border rounded-md cursor-pointer ${selectedClasses.includes(className) ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                                        onClick={() => handleClassClick(className)}
+                                    >
+                                        {className}
+                                    </div>
+                                ))}
+                            </div>
+                            {errors.classesAssigned && (
+                                <p className="text-xs text-red-400">
+                                    {errors.classesAssigned.message}
+                                </p>
+                            )}
                         </div>
-                        {errors.subjectsTaught && (
-                            <p className="text-xs text-red-400">
-                                {errors.subjectsTaught.message}
-                            </p>
-                        )}
-                    </div>
-                    <div className="flex flex-col gap-2 w-full">
-                        <label className="text-base text-gray-600 font-medium">Assign to Class</label>
-                        <div className="flex flex-wrap gap-2">
-                            {classes.map((className) => (
-                                <div
-                                    key={className}
-                                    className={`p-2 border rounded-md cursor-pointer ${selectedClasses.includes(className) ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-                                    onClick={() => handleClassClick(className)}
-                                >
-                                    {className}
-                                </div>
-                            ))}
+                        <div className="flex justify-between">
+                            <button type="button" onClick={prevStep} className="bg-gray-500 text-white p-2 rounded-md">
+                                Previous
+                            </button>
+                            <button type="submit" className="bg-[#018abd] text-white p-2 rounded-md" disabled={loading}>
+                                {loading ? "Creating..." : (type === "create" ? "Create" : "Update")}
+                            </button>
                         </div>
-                        {errors.classesAssigned && (
-                            <p className="text-xs text-red-400">
-                                {errors.classesAssigned.message}
-                            </p>
-                        )}
+                    </>
+                )}
+            </form>
+
+            {showSuccessModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
+                    <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+                        <h2 className="text-xl font-semibold mb-4">Teacher Created Successfully</h2>
+                        <Link href="/admin">
+                            <button className="bg-[#018abd] text-white px-4 py-2 rounded-md">
+                                Done
+                            </button>
+                        </Link>
                     </div>
-                    <div className="flex justify-between">
-                        <button type="button" onClick={prevStep} className="bg-gray-500 text-white p-2 rounded-md">
-                            Previous
-                        </button>
-                        <button type="submit" className="bg-[#018abd] text-white p-2 rounded-md" disabled={loading}>
-                            {loading ? "Creating..." : (type === "create" ? "Create" : "Update")}
-                        </button>
-                    </div>
-                </>
+                </div>
             )}
-        </form>
+        </>
     );
 };
 
