@@ -17,6 +17,29 @@ const Announcements = () => {
     description: "",
   });
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<any | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  const fetchUserRole = async () => {
+    try {
+      const uid = auth.currentUser?.uid;
+      if (!uid) {
+        console.error("No user is logged in");
+        return;
+      }
+
+      const userDocRef = doc(db, "users", uid);
+      const userDoc = await getDoc(userDocRef);
+      if (!userDoc.exists()) {
+        console.error("User document not found");
+        return;
+      }
+
+      const userData = userDoc.data();
+      setUserRole(userData?.role || null);
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+    }
+  };
 
   const fetchAnnouncements = async () => {
     try {
@@ -51,6 +74,7 @@ const Announcements = () => {
   };
 
   useEffect(() => {
+    fetchUserRole();
     fetchAnnouncements();
   }, []);
 
@@ -131,28 +155,30 @@ const Announcements = () => {
     <div className="bg-white p-6 rounded-lg shadow-md relative">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-semibold text-gray-800">Announcements</h1>
-        <div className="relative">
-          <button
-            title="drop"
-            onClick={toggleDropdown}
-            className="flex items-center text-xs hover:underline"
-          >
-            <IoIosMore size={20} className="cursor-pointer" />
-          </button>
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-10">
-              <Link href="/announcements" className="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700">
-                <FaEye className="mr-2" /> View All
-              </Link>
-              <button
-                onClick={() => openModal()}
-                className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-gray-700"
-              >
-                <FaCalendarPlus className="mr-2" /> Create
-              </button>
-            </div>
-          )}
-        </div>
+        {userRole === "Admin" && (
+          <div className="relative">
+            <button
+              title="drop"
+              onClick={toggleDropdown}
+              className="flex items-center text-xs hover:underline"
+            >
+              <IoIosMore size={20} className="cursor-pointer" />
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+                <Link href="/announcements" className="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700">
+                  <FaEye className="mr-2" /> View All
+                </Link>
+                <button
+                  onClick={() => openModal()}
+                  className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-gray-700"
+                >
+                  <FaCalendarPlus className="mr-2" /> Create
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">
@@ -160,18 +186,20 @@ const Announcements = () => {
           <div className="flex flex-col items-center justify-center h-64">
             <FaCalendarPlus size={48} className="text-gray-400" />
             <p className="text-gray-500 mt-4">No announcements available</p>
-            <button
-              className="mt-4 bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
-              onClick={() => openModal()}
-            >
-              Create First Announcement
-            </button>
+            {userRole === "Admin" && (
+              <button
+                className="mt-4 bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
+                onClick={() => openModal()}
+              >
+                Create First Announcement
+              </button>
+            )}
           </div>
         ) : (
           announcements.map((announcement, index) => (
             <div
               key={index}
-              className="border border-[#018abd] rounded-lg p-4 transition-transform transform hover:scale-105 hover:shadow-lg cursor-pointer"
+              className={`border border-[#018abd] rounded-lg p-4 transition-transform transform hover:scale-105 hover:shadow-lg ${userRole !== "Admin" ? "pointer-events-none" : ""}`}
             >
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-medium text-gray-700">
@@ -184,22 +212,24 @@ const Announcements = () => {
               <p className="text-sm text-gray-500 mt-2">
                 {announcement.description}
               </p>
-              <div className="flex justify-end mt-2">
-                <button
-                title="edit"
-                  onClick={() => openModal(announcement)}
-                  className="mr-2 px-2 py-2 bg-[#018abd] text-white rounded-md"
-                >
-                  <FaEdit />
-                </button>
-                <button
-                title="delete"
-                  onClick={() => handleDelete(announcement.id)}
-                  className="px-2 py-1 bg-red-500 text-white rounded-md"
-                >
-                  <FaTrash />
-                </button>
-              </div>
+              {userRole === "Admin" && (
+                <div className="flex justify-end mt-2">
+                  <button
+                    title="edit"
+                    onClick={() => openModal(announcement)}
+                    className="mr-2 px-2 py-2 bg-[#018abd] text-white rounded-md"
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    title="delete"
+                    onClick={() => handleDelete(announcement.id)}
+                    className="px-2 py-1 bg-red-500 text-white rounded-md"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              )}
             </div>
           ))
         )}
@@ -236,7 +266,7 @@ const Announcements = () => {
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Select Date</label>
                 <input
-                title="date"
+                  title="date"
                   type="date"
                   name="date"
                   value={newAnnouncement.date}
