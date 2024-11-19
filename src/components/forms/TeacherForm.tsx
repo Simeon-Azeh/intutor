@@ -6,9 +6,6 @@ import { z } from "zod";
 import React, { useState } from 'react';
 import InputField from "../InputField";
 import { UserRoundPen, UserRound } from 'lucide-react';
-import { auth, db } from "../../firebase/firebaseConfig";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
 
 const schema = z.object({
     username: z
@@ -108,51 +105,22 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
     const onSubmit = async (formData: Inputs) => {
         setLoading(true);
         try {
-            const uid = auth.currentUser?.uid;
-            if (!uid) {
-                console.error("No user is logged in");
-                setLoading(false);
-                return;
-            }
-
-            const userDocRef = doc(db, "users", uid);
-            const userDoc = await getDoc(userDocRef);
-            if (!userDoc.exists()) {
-                console.error("User document not found");
-                setLoading(false);
-                return;
-            }
-
-            const userData = userDoc.data();
-            const schoolName = userData?.school;
-            if (!schoolName) {
-                console.error("School name not found in user document");
-                setLoading(false);
-                return;
-            }
-
-            const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-            const newUser = userCredential.user;
-
-            await setDoc(doc(db, "users", newUser.uid), {
-                username: formData.username,
-                email: formData.email,
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                phone: formData.phone,
-                address: formData.address,
-                emergencyContact: formData.emergencyContact,
-                birthday: new Date(formData.birthday),
-                sex: formData.sex,
-                subjectsTaught: formData.subjectsTaught,
-                classesAssigned: formData.classesAssigned,
-                school: schoolName,
-                role: "teacher"
+            const response = await fetch('http://localhost:5000/create-teacher', { // Replace with your server URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
             });
-
+    
+            if (!response.ok) {
+                throw new Error('Failed to create teacher');
+            }
+    
             // Handle success (e.g., show a success message, redirect, etc.)
+            console.log('Teacher created successfully');
         } catch (error) {
-            console.error("Error creating teacher:", error);
+            console.error('Error creating teacher:', error);
             // Handle error (e.g., show an error message)
         } finally {
             setLoading(false);
