@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { IoIosMore } from "react-icons/io";
 import { Menu } from "@headlessui/react";
@@ -7,26 +8,65 @@ import {
   RadialBar,
   ResponsiveContainer,
 } from "recharts";
-
-const data = [
-  {
-    name: "Total",
-    count: 106,
-    fill: "#f9feff",
-  },
-  {
-    name: "Girls",
-    count: 53,
-    fill: "#ff6347",
-  },
-  {
-    name: "Boys",
-    count: 53,
-    fill: "#018abd",
-  },
-];
+import { db, auth } from "../firebase/firebaseConfig";
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 
 const CountChart = () => {
+  const [data, setData] = useState([
+    { name: "Total", count: 0, fill: "#f9feff" },
+    { name: "Girls", count: 0, fill: "#ff6347" },
+    { name: "Boys", count: 0, fill: "#018abd" },
+  ]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        // Get the currently logged-in user's UID
+        const uid = auth.currentUser?.uid;
+        if (!uid) {
+          console.error("No user is logged in");
+          return;
+        }
+
+        // Fetch the admin's school information from Firestore
+        const userDocRef = doc(db, "users", uid);
+        const userDoc = await getDoc(userDocRef);
+        if (!userDoc.exists()) {
+          console.error("User document not found");
+          return;
+        }
+
+        const userData = userDoc.data();
+        const schoolName = userData?.school;
+        if (!schoolName) {
+          console.error("School name not found in user document");
+          return;
+        }
+
+        // Query Firestore to get students from the specific school
+        const q = query(collection(db, "users"), where("school", "==", schoolName), where("role", "==", "Student"));
+        const querySnapshot = await getDocs(q);
+
+        // Filter and count students based on gender
+        const students = querySnapshot.docs.map(doc => doc.data());
+        const boysCount = students.filter(student => student.gender === "male").length;
+        const girlsCount = students.filter(student => student.gender === "female").length;
+        const totalCount = boysCount + girlsCount;
+
+        // Update the chart data
+        setData([
+          { name: "Total", count: totalCount, fill: "#f9feff" },
+          { name: "Girls", count: girlsCount, fill: "#ff6347" },
+          { name: "Boys", count: boysCount, fill: "#018abd" },
+        ]);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   return (
     <div className="bg-white rounded-xl w-full h-full p-4">
       {/* TITLE */}
@@ -102,13 +142,13 @@ const CountChart = () => {
       <div className="flex justify-center gap-12">
         <div className="flex flex-col gap-1">
           <div className="w-5 h-5 bg-[#018abd] rounded-full" />
-          <h1 className="font-bold">3</h1>
-          <h2 className="text-xs text-gray-300 flex items-center">Boys (55%)</h2>
+          <h1 className="font-bold">{data[2].count}</h1>
+          <h2 className="text-xs text-gray-300 flex items-center">Boys ({((data[2].count / data[0].count) * 100).toFixed(2)}%)</h2>
         </div>
         <div className="flex flex-col gap-1">
           <div className="w-5 h-5 bg-[#ff6347] rounded-full" />
-          <h1 className="font-bold">1</h1>
-          <h2 className="text-xs text-gray-300">Girls (45%)</h2>
+          <h1 className="font-bold">{data[1].count}</h1>
+          <h2 className="text-xs text-gray-300">Girls ({((data[1].count / data[0].count) * 100).toFixed(2)}%)</h2>
         </div>
       </div>
     </div>

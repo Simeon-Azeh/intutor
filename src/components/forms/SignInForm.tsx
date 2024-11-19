@@ -66,8 +66,8 @@ const SignInForm: React.FC = () => {
         // Set redirecting state to show message
         setRedirecting(true);
   
-        // Redirect based on onboarding status
-        if (!onboardingComplete) {
+        // Redirect based on role and onboarding status
+        if (userRole === "Admin" && !onboardingComplete) {
           router.push("/onboarding");
           return;
         }
