@@ -12,7 +12,7 @@ import { LuEye } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import EditTeacherForm, { Inputs } from "@/components/forms/EditTeacherForm";
 import { X, UserPen, UserX } from 'lucide-react';
-import { collection, query, where, getDocs, doc, getDoc, deleteDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc, deleteDoc, limit, startAfter, QueryDocumentSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
 type Teacher = {
@@ -71,43 +71,58 @@ const TeacherListPage = () => {
     const [userRole, setUserRole] = useState<string | null>(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
+    const [totalPages, setTotalPages] = useState(1);
     const router = useRouter();
 
-    useEffect(() => {
-        const fetchTeachers = async () => {
-            try {
-                const uid = auth.currentUser?.uid;
-                if (!uid) {
-                    router.push("/signin");
-                    return;
-                }
-
-                const userDocRef = doc(db, "users", uid);
-                const userDoc = await getDoc(userDocRef);
-                const userData = userDoc.data();
-                const userSchool = userData?.school;
-                setUserRole(userData?.role || null);
-
-                const q = query(collection(db, "teachers"), where("school", "==", userSchool));
-                const querySnapshot = await getDocs(q);
-                const teachersList: Teacher[] = querySnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data(),
-                    subjectsTaught: doc.data().subjectsTaught || [], // Provide default value
-                    classesAssigned: doc.data().classesAssigned || [], // Provide default value
-                    photo: "https://via.placeholder.com/150" // Placeholder image
-                } as Teacher));
-
-                setTeachers(teachersList);
-            } catch (error) {
-                console.error("Error fetching teachers:", error);
-            } finally {
-                setLoading(false);
+    const fetchTeachers = async (page: number) => {
+        setLoading(true);
+        try {
+            const uid = auth.currentUser?.uid;
+            if (!uid) {
+                router.push("/signin");
+                return;
             }
-        };
 
-        fetchTeachers();
-    }, [router]);
+            const userDocRef = doc(db, "users", uid);
+            const userDoc = await getDoc(userDocRef);
+            const userData = userDoc.data();
+            const userSchool = userData?.school;
+            setUserRole(userData?.role || null);
+
+            let q = query(collection(db, "teachers"), where("school", "==", userSchool), limit(5));
+            if (page > 1 && lastDoc) {
+                q = query(collection(db, "teachers"), where("school", "==", userSchool), startAfter(lastDoc), limit(5));
+            }
+
+            const querySnapshot = await getDocs(q);
+            const teachersList: Teacher[] = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+                subjectsTaught: doc.data().subjectsTaught || [], // Provide default value
+                classesAssigned: doc.data().classesAssigned || [], // Provide default value
+                photo: "https://via.placeholder.com/150" // Placeholder image
+            } as Teacher));
+
+            setTeachers(teachersList);
+            setLastDoc(querySnapshot.docs[querySnapshot.docs.length - 1] || null);
+
+            // Calculate total pages
+            const totalTeachersQuery = query(collection(db, "teachers"), where("school", "==", userSchool));
+            const totalTeachersSnapshot = await getDocs(totalTeachersQuery);
+            const totalTeachers = totalTeachersSnapshot.size;
+            setTotalPages(Math.ceil(totalTeachers / 5));
+        } catch (error) {
+            console.error("Error fetching teachers:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTeachers(currentPage);
+    }, [currentPage]);
 
     const handleEditClick = (teacher: Teacher) => {
         setSelectedTeacher(teacher);
@@ -245,7 +260,7 @@ const TeacherListPage = () => {
                 <Table columns={columns} renderRow={renderRow} data={teachers} />
             )}
             {/* PAGINATION */}
-            <Pagination />
+            <Pagination currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} />
 
             {/* EDIT MODAL */}
             {isEditModalOpen && selectedTeacher && (
