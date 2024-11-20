@@ -56,8 +56,8 @@ const SignInForm: React.FC = () => {
         const userRole = userData?.role; // This is the role of the user
         const onboardingComplete = userData?.onboardingComplete;
   
-        // Validate that the role matches
-        if (userRole !== role) {
+        // Validate that the role matches (case-insensitive comparison)
+        if (userRole?.toLowerCase() !== role.toLowerCase()) {
           setError("The selected role doesn't match your account role.");
           setLoading(false);
           return;
