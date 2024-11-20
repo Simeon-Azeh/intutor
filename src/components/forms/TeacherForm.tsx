@@ -136,7 +136,7 @@ const TeacherForm: React.FC<TeacherFormProps> = ({ data, type }) => {
             const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
             const user = userCredential.user;
 
-            const teacherId = `teacher_${Date.now()}`;
+            const teacherId = `Int${Date.now()}`;
 
             const teacherData = {
                 name: formData.username,

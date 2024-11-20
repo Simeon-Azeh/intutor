@@ -11,8 +11,8 @@ import { IoFilterCircleOutline } from "react-icons/io5";
 import { LuEye } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import EditTeacherForm, { Inputs } from "@/components/forms/EditTeacherForm";
-import { X, UserPen } from 'lucide-react';
-import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { X, UserPen, UserX } from 'lucide-react';
+import { collection, query, where, getDocs, doc, getDoc, deleteDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
 type Teacher = {
@@ -69,6 +69,8 @@ const TeacherListPage = () => {
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const [loading, setLoading] = useState(true);
     const [userRole, setUserRole] = useState<string | null>(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [teacherToDelete, setTeacherToDelete] = useState<Teacher | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -118,6 +120,35 @@ const TeacherListPage = () => {
         setIsEditModalOpen(false);
     };
 
+    const handleDeleteClick = (teacher: Teacher) => {
+        setTeacherToDelete(teacher);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (teacherToDelete) {
+            try {
+                // Delete from teachers collection
+                await deleteDoc(doc(db, "teachers", teacherToDelete.id));
+                console.log(`Deleted teacher from teachers collection with id: ${teacherToDelete.id}`);
+
+                // Delete from users collection
+                const userQuery = query(collection(db, "users"), where("email", "==", teacherToDelete.email));
+                const userSnapshot = await getDocs(userQuery);
+                userSnapshot.forEach(async (userDoc) => {
+                    await deleteDoc(userDoc.ref);
+                    console.log(`Deleted teacher from users collection with id: ${userDoc.id}`);
+                });
+
+                setTeachers(teachers.filter(teacher => teacher.id !== teacherToDelete.id));
+                setIsDeleteModalOpen(false);
+                setTeacherToDelete(null);
+            } catch (error) {
+                console.error("Error deleting teacher:", error);
+            }
+        }
+    };
+
     const renderRow = (item: Teacher) => (
         <tr
             key={item.id}
@@ -132,15 +163,15 @@ const TeacherListPage = () => {
                     className="md:hidden xl:block w-10 h-10 rounded-full object-cover"
                 />
                 <div className="flex flex-col">
-                    <h3 className="font-semibold">{item.name}</h3>
-                    <p className="text-xs text-gray-500">{item?.email}</p>
+                    <h3 className="font-semibold">{item.name.length > 15 ? `${item.name.slice(0, 15)}...` : item.name}</h3>
+                    <p className="text-xs text-gray-500">{item.email}</p>
                 </div>
             </td>
             <td className="hidden md:table-cell">{item.teacherId}</td>
-            <td className="hidden md:table-cell">{item.subjectsTaught.join(",")}</td> {/* Update field name */}
-            <td className="hidden md:table-cell">{item.classesAssigned.join(",")}</td> {/* Update field name */}
+            <td className="hidden md:table-cell">{item.subjectsTaught.join(", ").length > 20 ? `${item.subjectsTaught.join(", ").slice(0, 20)}...` : item.subjectsTaught.join(", ")}</td>
+            <td className="hidden md:table-cell">{item.classesAssigned.join(", ").length > 20 ? `${item.classesAssigned.join(", ").slice(0, 20)}...` : item.classesAssigned.join(", ")}</td>
             <td className="hidden md:table-cell">{item.phone}</td>
-            <td className="hidden md:table-cell">{item.address}</td>
+            <td className="hidden md:table-cell">{item.address.length > 20 ? `${item.address.slice(0, 20)}...` : item.address}</td>
             <td>
                 <div className="flex items-center gap-2">
                     <Link href={`/list/teachers/${item.id}`}>
@@ -161,7 +192,14 @@ const TeacherListPage = () => {
                             >
                                 <UserPen size={18} />
                             </button>
-                            <FormModal table="teacher" type="delete" id={item.id} />
+                            <button 
+                                type="button"
+                                title={`Delete ${item.name}`} // Add title for accessibility
+                                className="w-7 h-7 flex items-center justify-center rounded-full text-red-600"
+                                onClick={() => handleDeleteClick(item)}
+                            >
+                                <UserX size={18} />
+                            </button>
                         </>
                     )}
                 </div>
@@ -198,6 +236,11 @@ const TeacherListPage = () => {
             {/* LIST */}
             {loading ? (
                 <p>Loading...</p>
+            ) : teachers.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full">
+                    <UserX size={48} className="text-gray-400" />
+                    <p className="text-gray-400 mt-4">You haven't added any teachers yet.</p>
+                </div>
             ) : (
                 <Table columns={columns} renderRow={renderRow} data={teachers} />
             )}
@@ -216,6 +259,39 @@ const TeacherListPage = () => {
                             onClick={() => setIsEditModalOpen(false)}
                         >
                            <X />
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* DELETE CONFIRMATION MODAL */}
+            {isDeleteModalOpen && teacherToDelete && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-4 rounded-md w-full max-w-lg relative">
+                        <p className="text-center font-medium">Are you sure you want to delete {teacherToDelete.name}?</p>
+                        <div className="flex justify-center gap-4 mt-4">
+                            <button
+                                type="button"
+                                className="bg-red-600 text-white py-2 px-4 rounded-md"
+                                onClick={handleDeleteConfirm}
+                            >
+                                Delete
+                            </button>
+                            <button
+                                type="button"
+                                className="bg-gray-600 text-white py-2 px-4 rounded-md"
+                                onClick={() => setIsDeleteModalOpen(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                        <button
+                            title="close"
+                            type="button"
+                            className="absolute top-2 right-4 text-gray-600"
+                            onClick={() => setIsDeleteModalOpen(false)}
+                        >
+                            <X />
                         </button>
                     </div>
                 </div>
