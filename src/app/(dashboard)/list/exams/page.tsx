@@ -82,7 +82,7 @@ const ExamListPage = () => {
       {/* LIST */}
       <Table columns={columns} renderRow={renderRow} data={examsData} />
       {/* PAGINATION */}
-      <Pagination />
+    
     </div>
   );
 };
