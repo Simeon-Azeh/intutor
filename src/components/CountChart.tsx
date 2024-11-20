@@ -44,13 +44,17 @@ const CountChart = () => {
         }
 
         // Query Firestore to get students from the specific school
-        const q = query(collection(db, "users"), where("school", "==", schoolName), where("role", "==", "Student"));
+        const q = query(
+          collection(db, "users"),
+          where("school", "==", schoolName),
+          where("role", "==", "Student")
+        );
         const querySnapshot = await getDocs(q);
 
-        // Filter and count students based on gender
+        // Filter and count students based on sex
         const students = querySnapshot.docs.map(doc => doc.data());
-        const boysCount = students.filter(student => student.gender === "male").length;
-        const girlsCount = students.filter(student => student.gender === "female").length;
+        const boysCount = students.filter(student => student.sex?.toLowerCase() === "male").length;
+        const girlsCount = students.filter(student => student.sex?.toLowerCase() === "female").length;
         const totalCount = boysCount + girlsCount;
 
         // Update the chart data
