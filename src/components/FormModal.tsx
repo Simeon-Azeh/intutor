@@ -12,12 +12,16 @@ const TeacherForm = dynamic(() => import("./forms/TeacherForm"), {
 const StudentForm = dynamic(() => import("./forms/StudentForm"), {
   loading: () => <h1>Loading...</h1>,
 });
+const ParentsForm = dynamic(() => import("./forms/ParentsForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
 
 const forms: {
   [key: string]: (type: "create" | "update", data?: any) => JSX.Element;
 } = {
   teacher: (type, data) => <TeacherForm type={type} data={data} />,
-  student: (type, data) => <StudentForm type={type} data={data} />
+  student: (type, data) => <StudentForm type={type} data={data} />,
+  parent: (type, data) => <ParentsForm type={type} data={data} />,
 };
 
 const FormModal = ({
@@ -43,10 +47,11 @@ const FormModal = ({
   data?: any;
   id?: string; // Change this to string
 }) => {
+  const textColor = type === "create" ? "text-white" : "text-slate-200";
   const size = type === "create" ? "w-8 h-8" : "w-7 h-7";
   const bgColor =
     type === "create"
-      ? "bg-[#018abd] text-[#fff]"
+      ? "bg-[#018abd]"
       : type === "update"
       ? "bg-lamaSky"
       : "bg-lamaPurple";
@@ -74,7 +79,7 @@ const FormModal = ({
     <>
       <button
         type="button" // Explicitly set the button type
-        className={`${size} flex items-center justify-center rounded-full ${bgColor}`}
+        className={`${size} flex items-center justify-center rounded-full ${bgColor} ${textColor} text-white`}
         onClick={() => setOpen(true)}
         title={`${type} button`} // Add title for accessibility
       >

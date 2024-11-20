@@ -61,7 +61,7 @@ const AdminPage = () => {
         // Calculate counts for each role
         const studentCount = usersList.filter(user => user.role === "Student").length;
         const teacherCount = usersList.filter(user => user.role === "Teacher").length;
-        const parentCount = usersList.filter(user => user.role === "parent").length;
+        const parentCount = usersList.filter(user => user.role === "Parent").length;
         const staffCount = usersList.filter(user => user.role === "Admin").length;
 
         setStudentCount(studentCount);

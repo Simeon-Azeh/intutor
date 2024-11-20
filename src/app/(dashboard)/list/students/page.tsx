@@ -176,7 +176,7 @@ const StudentListPage = () => {
             <button 
             type="button"
             title={`View ${item.name}`} // Add title for accessibility
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-yellow-50 text='#333">
+            className="w-7 h-7 flex items-center justify-center rounded-full  text'#333' ">
               <LuEye size={18} />
             </button>
           </Link>
