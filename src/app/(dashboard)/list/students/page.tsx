@@ -216,14 +216,14 @@ const StudentListPage = () => {
             <button 
               type="button"
               title="Filter"
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow-50"
+              className="w-8 h-8 flex items-center justify-center rounded-full "
             >
               <IoFilterCircleOutline size={24} />
             </button>
             <button
               type="button"
               title="Sort"
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow-50"
+              className="w-8 h-8 flex items-center justify-center rounded-full"
             >
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
@@ -231,7 +231,7 @@ const StudentListPage = () => {
               <button
                 type="button"
                 title="Add Student"
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow-50"
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-[#018abd] text-white"
                 onClick={() => setIsCreateModalOpen(true)}
               >
                 <Plus size={24} />
@@ -257,7 +257,7 @@ const StudentListPage = () => {
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-md w-full max-w-lg relative">
-            <StudentForm type="create" onClose={() => setIsCreateModalOpen(false)} />
+            <StudentForm type="create" />
             <button
               title="Close"
               type="button"

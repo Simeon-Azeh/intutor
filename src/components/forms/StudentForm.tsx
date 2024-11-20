@@ -46,10 +46,9 @@ const classes = [
 interface StudentFormProps {
     data?: Partial<Inputs>;
     type: "create" | "update";
-    onClose: () => void;
 }
 
-const StudentForm: React.FC<StudentFormProps> = ({ data = {}, type, onClose }) => {
+const StudentForm: React.FC<StudentFormProps> = ({ data = {}, type }) => {
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<Inputs>({
         resolver: zodResolver(schema),
         defaultValues: {
