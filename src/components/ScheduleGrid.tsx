@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, updateDoc, doc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { FaCalendarAlt, FaCheckCircle } from "react-icons/fa";
 
@@ -89,7 +89,7 @@ const ScheduleGrid = () => {
   useEffect(() => {
     const fetchSchedules = async () => {
       const querySnapshot = await getDocs(collection(db, "schedules"));
-      const schedulesList = querySnapshot.docs.map(doc => doc.data());
+      const schedulesList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setSchedules(schedulesList);
     };
 
@@ -132,8 +132,17 @@ const ScheduleGrid = () => {
         return acc;
       }, {} as GroupedSchedules);
 
-      await Promise.all(Object.values(groupedSchedules).map(schedule => addDoc(collection(db, "schedules"), schedule)));
-      setSchedules([...schedules, ...Object.values(groupedSchedules)]);
+      for (const schedule of Object.values(groupedSchedules)) {
+        const existingSchedule = schedules.find(s => s.id === schedule.id);
+        if (existingSchedule) {
+          await updateDoc(doc(db, "schedules", existingSchedule.id), schedule);
+        } else {
+          await addDoc(collection(db, "schedules"), schedule);
+        }
+      }
+
+      const updatedSchedules = await getDocs(collection(db, "schedules"));
+      setSchedules(updatedSchedules.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       setNewSchedule({});
       setSuccess(true);
       setTimeout(() => setSuccess(false), 10000); // Hide success message after 10 seconds
@@ -209,7 +218,7 @@ const ScheduleGrid = () => {
             <h3 className="text-lg font-semibold mb-2 mt-4">{curriculum}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {groupedSchedulesByCurriculum[curriculum].map((schedule, index) => (
-                <div key={index} className="p-4 border rounded-md ">
+                <div key={index} className="p-4 border rounded-md shadow-md">
                   <p><strong>Course:</strong> {schedule.name}</p>
                   <p><strong>Teachers:</strong> {schedule.teachers.join(", ")}</p>
                   <p><strong>Duration:</strong> {schedule.duration}</p>

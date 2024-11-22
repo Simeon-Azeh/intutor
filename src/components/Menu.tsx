@@ -16,7 +16,7 @@ const menuItems = [
       { icon: "/teacher.png", label: "Teachers", href: "/list/teachers", visible: ["Admin", "Teacher"] },
       { icon: "/student.png", label: "Students", href: "/list/students", visible: ["Admin", "Teacher"] },
       { icon: "/parent.png", label: "Parents", href: "/list/parents", visible: ["Admin", "Teacher"] },
-      { icon: "/subject.png", label: "Subjects", href: "/list/subjects", visible: ["Admin"] },
+      { icon: "/subject.png", label: "Courses", href: "/list/subjects", visible: ["Admin"] },
       { icon: "/class.png", label: "Classes", href: "/list/classes", visible: ["Admin", "Teacher"] },
       { icon: "/lesson.png", label: "Lessons", href: "/list/lessons", visible: ["Admin", "Teacher"] },
       { icon: "/exam.png", label: "Exams", href: "/list/exams", visible: ["Admin", "Teacher", "Student", "Parent"] },
