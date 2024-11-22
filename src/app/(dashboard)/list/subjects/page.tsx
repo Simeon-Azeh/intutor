@@ -1,83 +1,55 @@
-import FormModal from "@/components/FormModal";
-import Pagination from "@/components/Pagination";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
-import { role, subjectsData } from "@/lib/data";
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { db } from "@/firebase/firebaseConfig"; // Make sure to configure your firebase
+import { collection, getDocs } from "firebase/firestore";
+import CourseCreationForm from "@/components/forms/CourseCreation";
+import CourseCard from "@/components/CourseCard";
+import ScheduleGrid from "@/components/ScheduleGrid";
 
 type Subject = {
-  id: number;
+  id: string;
   name: string;
   teachers: string[];
+  duration: string;
+  classAssigned: string;
+  school: string;
+  level?: string;
+  startDate?: string;
+  endDate?: string;
 };
 
-const columns = [
-  {
-    header: "Subject Name",
-    accessor: "name",
-  },
-  {
-    header: "Teachers",
-    accessor: "teachers",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
-];
-
 const SubjectListPage = () => {
-  const renderRow = (item: Subject) => (
-    <tr
-      key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
-    >
-      <td className="flex items-center gap-4 p-4">{item.name}</td>
-      <td className="hidden md:table-cell">{item.teachers.join(",")}</td>
-      <td>
-        <div className="flex items-center gap-2">
-          {role === "admin" && (
-            <>
-              <FormModal table="subject" type="update" data={item} />
-              <FormModal table="subject" type="delete" id={item.id.toString()} /> 
-            </>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const querySnapshot = await getDocs(collection(db, "courses"));
+      const coursesList: Subject[] = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Subject[];
+      setSubjects(coursesList);
+    };
+
+    fetchCourses();
+  }, []);
+
+  const handleCreateCourse = (newSubject: Subject) => {
+    setSubjects([...subjects, newSubject]);
+  };
 
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-2">
-      {/* TOP */}
-      <div className="flex items-center justify-between">
-        <h1 className="hidden md:block text-lg font-semibold">All Subjects</h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
-          <div className="flex items-center gap-4 self-end">
-            <button
-              type="button"
-              title="button"
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-50"
-            >
-              <Image src="/filter.png" alt="" width={14} height={14} />
-            </button>
-            <button
-              type="button"
-              title="button"
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-orange-50"
-            >
-              <Image src="/sort.png" alt="" width={14} height={14} />
-            </button>
-            {role === "admin" && <FormModal table="subject" type="create" />}
-          </div>
-        </div>
+       
+      <CourseCreationForm onCreate={handleCreateCourse} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {subjects.map(subject => (
+          <CourseCard key={subject.id} subject={subject} />
+        ))}
       </div>
-      {/* LIST */}
-      <Table columns={columns} renderRow={renderRow} data={subjectsData} />
-      {/* PAGINATION */}
-     
+      <ScheduleGrid />
+    
     </div>
   );
 };
