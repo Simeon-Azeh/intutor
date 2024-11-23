@@ -14,6 +14,7 @@ import EditTeacherForm, { Inputs } from "@/components/forms/EditTeacherForm";
 import { X, UserPen, UserX } from 'lucide-react';
 import { collection, query, where, getDocs, doc, getDoc, deleteDoc, limit, startAfter, QueryDocumentSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import TableLoader from "@/components/Loaders/TableLoader"; // Import TableLoader
 
 type Teacher = {
     id: string;
@@ -250,7 +251,7 @@ const TeacherListPage = () => {
             </div>
             {/* LIST */}
             {loading ? (
-                <p>Loading...</p>
+                <TableLoader /> // Use TableLoader component here
             ) : teachers.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full">
                     <UserX size={48} className="text-gray-400" />

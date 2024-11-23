@@ -224,3 +224,5 @@ body {
     grid-template-columns: repeat(2, 1fr); /* 2 cards per row on small screens */
   }
 }
+
+/* styles.css or global.css */

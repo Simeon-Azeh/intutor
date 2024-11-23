@@ -14,6 +14,7 @@ import EditStudentForm, { Inputs } from "@/components/forms/EditStudentForm";
 import StudentForm from "@/components/forms/StudentForm";
 import { X, UserPen, UserX, Plus } from 'lucide-react';
 import { collection, query, where, getDocs, doc, getDoc, deleteDoc, limit, startAfter, QueryDocumentSnapshot } from "firebase/firestore";
+import TableLoader from "@/components/Loaders/TableLoader"; // Import TableLoader
 
 type Student = {
   id: string;
@@ -242,7 +243,7 @@ const StudentListPage = () => {
       </div>
       {/* LIST */}
       {loading ? (
-        <p>Loading...</p>
+        <TableLoader /> // Use TableLoader component here
       ) : students.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full">
           <p className="text-gray-400 mt-4">No students found.</p>
