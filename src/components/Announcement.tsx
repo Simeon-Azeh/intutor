@@ -6,6 +6,7 @@ import { FaEye, FaCalendarPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { IoIosMore } from "react-icons/io";
 import { db, auth } from "../firebase/firebaseConfig";
 import { collection, query, where, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import EventsLoader from "@/components/Loaders/EventsLoader"; // Import EventsLoader
 
 const Announcements = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -18,6 +19,7 @@ const Announcements = () => {
   });
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<any | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [loadingAnnouncements, setLoadingAnnouncements] = useState(true); // Loading state for announcements
 
   const fetchUserRole = async () => {
     try {
@@ -70,6 +72,8 @@ const Announcements = () => {
       setAnnouncements(announcementsList);
     } catch (error) {
       console.error("Error fetching announcements:", error);
+    } finally {
+      setLoadingAnnouncements(false); // Stop loading after fetching announcements
     }
   };
 
@@ -152,7 +156,7 @@ const Announcements = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md relative">
+    <div className="bg-white p-6 rounded-lg  relative">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-semibold text-gray-800">Announcements</h1>
         {userRole === "Admin" && (
@@ -182,7 +186,9 @@ const Announcements = () => {
       </div>
 
       <div className="space-y-4">
-        {announcements.length === 0 ? (
+        {loadingAnnouncements ? (
+          <EventsLoader /> // Use EventsLoader component here
+        ) : announcements.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64">
             <FaCalendarPlus size={48} className="text-gray-400" />
             <p className="text-gray-500 mt-4">No announcements available</p>
@@ -199,7 +205,7 @@ const Announcements = () => {
           announcements.map((announcement, index) => (
             <div
               key={index}
-              className={`border border-[#018abd] rounded-lg p-4 transition-transform transform hover:scale-105 hover:shadow-lg ${userRole !== "Admin" ? "pointer-events-none" : ""}`}
+              className={`border border-[#018abd] shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 hover:shadow-lg ${userRole !== "Admin" ? "pointer-events-none" : ""}`}
             >
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-medium text-gray-700">

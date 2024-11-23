@@ -1,10 +1,7 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { CalendarOff } from 'lucide-react';
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-
 import {
   FiChevronLeft,
   FiChevronRight,
@@ -15,6 +12,7 @@ import {
 } from "react-icons/fi";
 import { db, auth } from "../firebase/firebaseConfig";
 import { collection, query, where, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import EventsLoader from "@/components/Loaders/EventsLoader"; // Import EventsLoader
 
 const EventCalendar = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -33,6 +31,7 @@ const EventCalendar = () => {
   const [loadingAdd, setLoadingAdd] = useState(false);
   const [loadingEdit, setLoadingEdit] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const [loadingEvents, setLoadingEvents] = useState(true); // Loading state for events
 
   const fetchUserRole = async () => {
     try {
@@ -85,6 +84,8 @@ const EventCalendar = () => {
       setEvents(eventsList);
     } catch (error) {
       console.error("Error fetching events:", error);
+    } finally {
+      setLoadingEvents(false); // Stop loading after fetching events
     }
   };
 
@@ -205,7 +206,7 @@ const EventCalendar = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md relative">
+    <div className="bg-white p-6 rounded-lg  relative">
       <Calendar
         value={value}
         className="custom-calendar"
@@ -232,7 +233,6 @@ const EventCalendar = () => {
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
                 <button
-                title="Add Event"
                   className="flex items-center w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
                   onClick={() => handleAction("Add Event")}
                   disabled={loadingAdd}
@@ -246,7 +246,9 @@ const EventCalendar = () => {
       </div>
 
       <div className="mt-4 space-y-4">
-        {events.length === 0 ? (
+        {loadingEvents ? (
+          <EventsLoader /> // Use EventsLoader component here
+        ) : events.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64">
             <CalendarOff size={48} className="text-gray-400" />
             <p className="text-gray-500 mt-4">No events available</p>
@@ -263,10 +265,10 @@ const EventCalendar = () => {
         ) : (
           events.map((event) => (
             <div
-    className={`p-4 rounded-lg shadow-md border border-[#018abd] cursor-pointer bg-white relative transition-transform transform hover:scale-105 hover:shadow-lg ${userRole !== "Admin" ? "pointer-events-none" : ""}`}
-    key={event.id}
-    onClick={userRole === "Admin" ? () => handleEventSelection(event) : undefined}
-  >
+              className={`p-4 rounded-lg shadow-md border border-[#018abd] cursor-pointer bg-white relative transition-transform transform hover:scale-105 hover:shadow-lg ${userRole !== "Admin" ? "pointer-events-none" : ""}`}
+              key={event.id}
+              onClick={userRole === "Admin" ? () => handleEventSelection(event) : undefined}
+            >
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-gray-600">{event.title}</h2>
                 <span className="text-xs text-gray-400">{event.time}</span>
