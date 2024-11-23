@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useEffect } from "react";
 import { CalendarOff } from 'lucide-react';
 import Calendar from "react-calendar";
