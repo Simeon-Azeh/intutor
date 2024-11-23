@@ -38,6 +38,9 @@ const NotificationsPage = () => {
   const [buttonLoading, setButtonLoading] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userSchool, setUserSchool] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({ title: "", description: "" });
+  const [notificationCount, setNotificationCount] = useState(0);
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -89,9 +92,9 @@ const NotificationsPage = () => {
     fetchNotifications();
   }, []);
 
-  const handleCreateNotification = async () => {
-    const title = prompt("Enter notification title:");
-    const description = prompt("Enter notification description:");
+  const handleCreateNotification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { title, description } = formData;
     if (title && description && userSchool) {
       setButtonLoading(true);
       try {
@@ -106,6 +109,8 @@ const NotificationsPage = () => {
         });
         toast.success("Notification created successfully!");
         fetchNotifications(); // Refresh notifications
+        setIsModalOpen(false); // Close the modal
+        setFormData({ title: "", description: "" }); // Reset form data
       } catch (error) {
         console.error("Error creating notification:", error);
         toast.error("Error creating notification.");
@@ -145,6 +150,7 @@ const NotificationsPage = () => {
       await updateDoc(notificationRef, { read: true });
       toast.success("Notification marked as read.");
       fetchNotifications(); // Refresh notifications
+      updateNotificationCount(); // Update notification count
     } catch (error) {
       console.error("Error marking notification as read:", error);
       toast.error("Error marking notification as read.");
@@ -163,6 +169,20 @@ const NotificationsPage = () => {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({ ...prevState, [name]: value }));
+  };
+
+  const updateNotificationCount = async () => {
+    const uid = auth.currentUser?.uid;
+    if (uid) {
+      const q = query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false));
+      const querySnapshot = await getDocs(q);
+        setNotificationCount(querySnapshot.size);
+    }
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -176,11 +196,10 @@ const NotificationsPage = () => {
       <h1 className="text-2xl font-semibold mb-4">Notifications</h1>
       {userRole === "Admin" && (
         <button
-          onClick={handleCreateNotification}
+          onClick={() => setIsModalOpen(true)}
           className="mb-4 px-4 py-2 bg-blue-500 text-white rounded-md"
-          disabled={buttonLoading}
         >
-          {buttonLoading ? "Creating..." : "Create Notification"}
+          Create Notification
         </button>
       )}
       <div className="space-y-4">
@@ -197,6 +216,10 @@ const NotificationsPage = () => {
                 >
                   Mark as Read
                 </button>
+              </div>
+            )}
+            {userRole === "Admin" && (
+              <div className="flex gap-2 mt-2">
                 <button
                   onClick={() => handleDeleteNotification(notification.id)}
                   className="px-4 py-2 bg-red-500 text-white rounded-md"
@@ -208,44 +231,98 @@ const NotificationsPage = () => {
           </div>
         ))}
       </div>
-      <h1 className="text-2xl font-semibold mt-8 mb-4">Events</h1>
-      <div className="space-y-4">
-        {events.map(event => (
-          <div key={event.id} className="p-4 bg-white rounded-md shadow-md">
-            <h2 className="text-xl font-semibold">{event.title}</h2>
-            <p className="text-gray-600">{event.description}</p>
-            <p className="text-gray-400 text-sm">{event.date}</p>
-            {userRole === "Admin" && (
-              <button
-                onClick={() => handlePushNotification(event.title, event.description)}
-                className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md"
-                disabled={buttonLoading}
-              >
-                {buttonLoading ? "Pushing..." : "Push Notification"}
-              </button>
-            )}
+      {userRole === "Admin" && (
+        <>
+          <h1 className="text-2xl font-semibold mt-8 mb-4">Events</h1>
+          <div className="space-y-4">
+            {events.map(event => (
+              <div key={event.id} className="p-4 bg-white rounded-md shadow-md">
+                <h2 className="text-xl font-semibold">{event.title}</h2>
+                <p className="text-gray-600">{event.description}</p>
+                <p className="text-gray-400 text-sm">{event.date}</p>
+                <button
+                  onClick={() => handlePushNotification(event.title, event.description)}
+                  className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md"
+                  disabled={buttonLoading}
+                >
+                  {buttonLoading ? "Pushing..." : "Push Notification"}
+                </button>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <h1 className="text-2xl font-semibold mt-8 mb-4">Announcements</h1>
-      <div className="space-y-4">
-        {announcements.map(announcement => (
-          <div key={announcement.id} className="p-4 bg-white rounded-md shadow-md">
-            <h2 className="text-xl font-semibold">{announcement.title}</h2>
-            <p className="text-gray-600">{announcement.description}</p>
-            <p className="text-gray-400 text-sm">{announcement.date}</p>
-            {userRole === "Admin" && (
-              <button
-                onClick={() => handlePushNotification(announcement.title, announcement.description)}
-                className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md"
-                disabled={buttonLoading}
-              >
-                {buttonLoading ? "Pushing..." : "Push Notification"}
-              </button>
-            )}
+          <h1 className="text-2xl font-semibold mt-8 mb-4">Announcements</h1>
+          <div className="space-y-4">
+            {announcements.map(announcement => (
+              <div key={announcement.id} className="p-4 bg-white rounded-md shadow-md">
+                <h2 className="text-xl font-semibold">{announcement.title}</h2>
+                <p className="text-gray-600">{announcement.description}</p>
+                <p className="text-gray-400 text-sm">{announcement.date}</p>
+                <button
+                  onClick={() => handlePushNotification(announcement.title, announcement.description)}
+                  className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md"
+                  disabled={buttonLoading}
+                >
+                  {buttonLoading ? "Pushing..." : "Push Notification"}
+                </button>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-md w-full max-w-lg relative">
+            <h2 className="text-xl font-semibold mb-4">Create Notification</h2>
+            <form onSubmit={handleCreateNotification}>
+              <div className="mb-4">
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-4">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-md"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                  disabled={buttonLoading}
+                >
+                  {buttonLoading ? "Creating..." : "Create"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

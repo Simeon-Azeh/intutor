@@ -25,7 +25,9 @@ const Navbar = () => {
       if (currentUser) {
         setUser(currentUser); // Set user info
         fetchUserDetails(currentUser.uid); // Fetch user details (name, school, role)
-        fetchNotificationCount(currentUser.uid); // Fetch notification count
+        if (userRole !== "Admin") {
+          fetchNotificationCount(currentUser.uid); // Fetch notification count for non-admin users
+        }
       } else {
         setUser(null);
       }
@@ -33,7 +35,7 @@ const Navbar = () => {
 
     // Clean up subscription on unmount
     return () => unsubscribe();
-  }, []);
+  }, [userRole]);
 
   const fetchUserDetails = async (uid: string) => {
     const userDocRef = doc(db, "users", uid); // Fetch user data from Firestore (users collection)
@@ -52,7 +54,7 @@ const Navbar = () => {
   };
 
   const fetchNotificationCount = async (uid: string) => {
-    const q = query(collection(db, "notifications"), where("userId", "==", uid));
+    const q = query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false));
     const querySnapshot = await getDocs(q);
     setNotificationCount(querySnapshot.size);
   };
@@ -79,7 +81,7 @@ const Navbar = () => {
         <Link href="/notifications">
           <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative">
             <MdOutlineNotificationsActive size={26} className="text-gray-600" />
-            {notificationCount > 0 && (
+            {userRole !== "Admin" && notificationCount > 0 && (
               <div className="absolute -top-2 -right-2.5 w-5 h-5 flex items-center justify-center bg-[#018abd] text-white rounded-full text-xs">
                 {notificationCount}
               </div>
