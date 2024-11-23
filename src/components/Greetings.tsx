@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { auth } from "@/firebase/firebaseConfig"; // Firebase auth
 import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
 import { FaSun, FaMoon, FaCoffee } from "react-icons/fa"; // Importing icons
-import UpWorkJob from "@/components/Loaders/UpWorkJob"; // Import UpWorkJob loader
+import UpworkJob from "../components/Loaders/UpworkJob"; // Import UpWorkJob loader
 
 const Greetings = () => {
   const [userName, setUserName] = useState<string>("User");
@@ -50,7 +50,7 @@ const Greetings = () => {
 
   // If still loading, render the UpWorkJob loader
   if (loading) {
-    return <UpWorkJob />;
+    return <UpworkJob />;
   }
 
   return (
