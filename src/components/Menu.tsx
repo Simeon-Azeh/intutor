@@ -6,6 +6,7 @@ import Link from "next/link";
 import { auth, signOut } from "@/firebase/firebaseConfig"; // Firebase auth and signOut
 import { onAuthStateChanged } from "firebase/auth"; // Firebase Auth listener
 import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
+import CheckboxList from "@/components/Loaders/CheckboxList"; // Import CheckboxList
 
 // Define menu items
 const menuItems = [
@@ -65,9 +66,9 @@ const Menu = () => {
     return () => unsubscribe(); // Clean up the subscription on component unmount
   }, []);
 
-  // If still loading, render a loading spinner or fallback UI
+  // If still loading, render the CheckboxList loader
   if (loading) {
-    return <div>Loading...</div>;
+    return <CheckboxList />;
   }
 
   // Handle logout
@@ -80,42 +81,42 @@ const Menu = () => {
       console.error("Error during logout:", error);
     }
   };
+
   const homeHref = role === "Admin" ? "/admin" 
   : role === "Teacher" ? "/teacher" 
   : role === "Student" ? "/student" 
   : role === "Parent" ? "/parent" 
   : "/";
 
-
   return (
     <div className="text-sm h-full overflow-y-auto">
-    {menuItems.map((section) => (
-      <div className="flex flex-col gap-2" key={section.title}>
-        <span className="hidden lg:block text-gray-400 font-light my-4">
-          {section.title}
-        </span>
-        {section.items.map((item) => {
-          // For the Home link, use the dynamic homeHref
-          const href = item.label === "Home" ? homeHref : item.href;
+      {menuItems.map((section) => (
+        <div className="flex flex-col gap-2" key={section.title}>
+          <span className="hidden lg:block text-gray-400 font-light my-4">
+            {section.title}
+          </span>
+          {section.items.map((item) => {
+            // For the Home link, use the dynamic homeHref
+            const href = item.label === "Home" ? homeHref : item.href;
 
-          if (item.visible.includes(role)) {
-            return (
-              <Link
-                href={href === "#" ? "#" : href}
-                key={item.label}
-                onClick={item.action === "logout" ? handleLogout : undefined}
-                className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-[#e2f5fc]"
-              >
-                <Image src={item.icon} alt="" width={20} height={20} />
-                <span className="hidden lg:block">{item.label}</span>
-              </Link>
-            );
-          }
-          return null;
-        })}
-      </div>
-    ))}
-  </div>
+            if (item.visible.includes(role)) {
+              return (
+                <Link
+                  href={href === "#" ? "#" : href}
+                  key={item.label}
+                  onClick={item.action === "logout" ? handleLogout : undefined}
+                  className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-[#e2f5fc]"
+                >
+                  <Image src={item.icon} alt="" width={20} height={20} />
+                  <span className="hidden lg:block">{item.label}</span>
+                </Link>
+              );
+            }
+            return null;
+          })}
+        </div>
+      ))}
+    </div>
   );
 };
 

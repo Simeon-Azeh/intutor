@@ -9,6 +9,7 @@ import FinanceChart from "@/components/FinanceChart";
 import UserCard from "@/components/UserCard";
 import Joyride from "react-joyride";
 import Greetings from "@/components/Greetings"; // Import Greetings component
+import UserCardLoaders from "@/components/Loaders/UserCardLoader"; // Import UserCardLoaders component
 import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/firebase/firebaseConfig"; // Adjust the import path as needed
 import { useRouter } from "next/navigation";
@@ -139,7 +140,7 @@ const AdminPage = () => {
         {/* USER CARDS */}
         <div className="user-cards flex gap-4 justify-between flex-wrap">
           {loading ? (
-            <p>Loading...</p>
+            <UserCardLoaders /> // Use UserCardLoaders component here
           ) : (
             <>
               <UserCard type="student" count={studentCount} />

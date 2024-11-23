@@ -4,12 +4,14 @@ import React, { useEffect, useState } from "react";
 import { auth } from "@/firebase/firebaseConfig"; // Firebase auth
 import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
 import { FaSun, FaMoon, FaCoffee } from "react-icons/fa"; // Importing icons
+import UpWorkJob from "@/components/Loaders/UpWorkJob"; // Import UpWorkJob loader
 
 const Greetings = () => {
   const [userName, setUserName] = useState<string>("User");
   const [greeting, setGreeting] = useState<string>("");
   const [motivation, setMotivation] = useState<string>("");
   const [icon, setIcon] = useState<JSX.Element>(<FaCoffee />); // Default icon
+  const [loading, setLoading] = useState<boolean>(true); // Loading state
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -24,6 +26,7 @@ const Greetings = () => {
           setUserName(data?.name || "User"); // Assuming 'name' field in Firestore document
         }
       }
+      setLoading(false); // Stop loading after fetching user data
     };
 
     // Set the time-based greeting and motivation
@@ -45,14 +48,19 @@ const Greetings = () => {
     fetchUserData();
   }, []);
 
+  // If still loading, render the UpWorkJob loader
+  if (loading) {
+    return <UpWorkJob />;
+  }
+
   return (
-    <div className="  gap-4 text-xl font-semibold text-gray-600 bg-white px-4 rounded py-6 ">
+    <div className="gap-4 text-xl font-semibold text-gray-600 bg-white px-4 rounded py-6">
       <div className="text-gray-600">
-       {greeting}, 
+        {greeting}, 
         <span className="text-[#018abd]"> {userName}</span>!
       </div>
       <div className="text-xs md:text-sm text-gray-400 font-medium flex items-center flex-row-reverse md:flex-row gap-2 mt-4">
-      {icon}
+        {icon}
         {motivation}
       </div>
     </div>

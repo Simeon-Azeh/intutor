@@ -205,3 +205,22 @@ body {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
+.user-card-loaders {
+  display: grid;
+  gap: 0.5rem; /* Reduce the gap between items */
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Adjust the minmax value */
+}
+
+@media (min-width: 1024px) {
+  .user-card-loaders {
+    grid-template-columns: repeat(4, 1fr); /* 4 cards per row on large screens */
+  }
+}
+
+@media (max-width: 1023px) {
+  .user-card-loaders {
+    grid-template-columns: repeat(2, 1fr); /* 2 cards per row on small screens */
+  }
+}
