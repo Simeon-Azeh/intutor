@@ -12,6 +12,7 @@ import { IoFilterCircleOutline } from "react-icons/io5";
 import { LuEye } from "react-icons/lu";
 import { X, UserPen, UserX, Plus, UserRoundX } from 'lucide-react';
 import ParentsForm from "@/components/forms/ParentsForm";
+import TableLoader from "@/components/Loaders/TableLoader"; // Import TableLoader
 
 type Parent = {
   id: string;
@@ -208,7 +209,7 @@ const ParentListPage = () => {
       </div>
       {/* LIST */}
       {loading ? (
-        <p>Loading...</p>
+        <TableLoader /> // Use TableLoader component here
       ) : parents.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-gray-400">
          <UserRoundX size={56} />

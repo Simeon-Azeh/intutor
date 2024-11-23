@@ -1,13 +1,48 @@
+"use client";
+
+import { useRouter, useParams } from "next/navigation"; // Use next/navigation instead of next/router
+import { useState, useEffect } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
 import Announcements from "@/components/Announcement";
 import BigCalendar from "@/components/BigCalender";
 import FormModal from "@/components/FormModal";
 import Performance from "@/components/Performance";
-import { role } from "@/lib/data";
 import Image from "next/image";
 import Link from "next/link";
-import { School, BookCopy, Banknote, Calendar, MapPin, BookOpen } from 'lucide-react';
+import { School, BookCopy, Banknote, Calendar, BookOpen } from 'lucide-react';
 
 const SingleTeacherPage = () => {
+  const router = useRouter();
+  const { id } = useParams(); // Use useParams to get the id parameter
+  const [teacher, setTeacher] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTeacher = async () => {
+      if (id) {
+        const docRef = doc(db, "teachers", id as string);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setTeacher(docSnap.data());
+        } else {
+          console.error("No such document!");
+        }
+        setLoading(false);
+      }
+    };
+
+    fetchTeacher();
+  }, [id]);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (!teacher) {
+    return <p>No teacher found.</p>;
+  }
+
   return (
     <div className="flex-1 p-4 flex flex-col gap-4 xl:flex-row">
       {/* LEFT */}
@@ -16,10 +51,10 @@ const SingleTeacherPage = () => {
         <div className="flex flex-col lg:flex-row gap-4">
           {/* USER INFO CARD */}
           <div className="bg-white py-4 px-6 ">
-          <div className="flex justify-center">
+            <div className="flex justify-center">
               <Image
-                src="/avatar.png"
-                alt=""
+                src={teacher.img || "/avatar.png"}
+                alt="Teacher Image"
                 width={100}
                 height={100}
                 className="rounded-[200px] object-cover mb-2"
@@ -27,72 +62,54 @@ const SingleTeacherPage = () => {
             </div>
             <div className="flex flex-col justify-between gap-4">
               <div className="flex items-center gap-4">
-                <h1 className="text-xl font-semibold text-[#1a1a1a]">Agbor Takeng</h1>
-                {role === "admin" && <FormModal
+                <h1 className="text-xl font-semibold text-[#1a1a1a]">{teacher.firstName} {teacher.lastName}</h1>
+                {teacher.role === "admin" && <FormModal
                   table="teacher"
                   type="update"
-                  data={{
-                    id: 1,
-                    username: "deanguerrero",
-                    email: "deanguerrero@gmail.com",
-                    password: "password",
-                    firstName: "Dean",
-                    lastName: "Guerrero",
-                    phone: "+237 654 693 75",
-                    address: "1234 Main St, Anytown, USA",
-                    bloodType: "A+",
-                    dateOfBirth: "2000-01-01",
-                    sex: "male",
-                    img: "/avatar.png",
-                  }}
+                  data={teacher}
                 />}
               </div>
               <p className="text-sm text-gray-500">
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit.
+                {teacher.description || "No description available."}
               </p>
               <div className="flex items-center justify-between gap-2 flex-wrap text-xs font-medium">
-                <div className="w-full  flex items-center gap-2">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                  <School size={16} />
-                  <span>2B, 1B, 3C, 2A, EN5, 6A</span>
-                  |
-                  </div>
-                  <div  className="flex items-center gap-2">
-                  <BookCopy size={16} />
-                  <span>Eng Phy, Maths203, CHEM201</span>
-                  </div>
-                </div>
-               
-                </div>
-                <div className="w-full  flex items-center gap-2">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                  <Image src="/date.png" alt="" width={14} height={14} />
-                  <span>Aug 2024</span>
-                  |
-                  </div>
-                  <div  className="flex items-center gap-2">
-                  <Banknote size={16} />
-                  <span>120,000 xaf</span>
+                <div className="w-full flex items-center gap-2">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <School size={16} />
+                      <span>{teacher.classesAssigned.join(", ")}</span>
+                      |
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <BookCopy size={16} />
+                      <span>{teacher.subjectsTaught.join(", ")}</span>
+                    </div>
                   </div>
                 </div>
-                
-               
+                <div className="w-full flex items-center gap-2">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Image src="/date.png" alt="Join Date" width={14} height={14} />
+                      <span>{teacher.joinDate}</span>
+                      |
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Banknote size={16} />
+                      <span>{teacher.salary} xaf</span>
+                    </div>
+                  </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                  <Image src="/mail.png" alt="" width={14} height={14} />
-                  <span>user@gmail.com</span>
-                  |
+                    <Image src="/mail.png" alt="Email" width={14} height={14} />
+                    <span>{teacher.email}</span>
+                    |
                   </div>
-                  <div  className="flex items-center gap-2">
-                  <Image src="/phone.png" alt="" width={14} height={14} />
-                  <span>+237 654 693 75</span>
+                  <div className="flex items-center gap-2">
+                    <Image src="/phone.png" alt="Phone" width={14} height={14} />
+                    <span>{teacher.phone}</span>
                   </div>
                 </div>
-             
-          
               </div>
             </div>
           </div>
@@ -106,7 +123,6 @@ const SingleTeacherPage = () => {
                 <span className="text-sm text-gray-400">Attendance</span>
               </div>
             </div>
-           
             {/* CARD */}
             <div className="bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-full 2xl:w-[48%]">
               <BookOpen size={24} className="text-[#018abd]" />
@@ -117,7 +133,7 @@ const SingleTeacherPage = () => {
             </div>
             {/* CARD */}
             <div className="bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-full 2xl:w-[48%]">
-            <School size={24} className="text-[#018abd]" />
+              <School size={24} className="text-[#018abd]" />
               <div className="">
                 <h1 className="text-xl font-semibold text-[#018abd] ">6</h1>
                 <span className="text-sm text-gray-400">Classes</span>
