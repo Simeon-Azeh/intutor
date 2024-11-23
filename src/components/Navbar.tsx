@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { auth } from "@/firebase/firebaseConfig"; // Firebase auth
+import { auth, db } from "@/firebase/firebaseConfig"; // Firebase auth and Firestore
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
+import { collection, query, where, getDocs, getDoc, doc } from "firebase/firestore"; // Firestore functions
 import { MdOutlineNotificationsActive } from "react-icons/md";
 import { TbHelpCircle } from "react-icons/tb";
 import { CgProfile } from "react-icons/cg";
 import { RiSettings4Line } from "react-icons/ri";
 import { IoMdLogOut } from "react-icons/io";
+import Link from "next/link";
 
 const Navbar = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -17,12 +18,14 @@ const Navbar = () => {
   const [userSchool, setUserSchool] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser); // Set user info
         fetchUserDetails(currentUser.uid); // Fetch user details (name, school, role)
+        fetchNotificationCount(currentUser.uid); // Fetch notification count
       } else {
         setUser(null);
       }
@@ -33,7 +36,6 @@ const Navbar = () => {
   }, []);
 
   const fetchUserDetails = async (uid: string) => {
-    const db = getFirestore();
     const userDocRef = doc(db, "users", uid); // Fetch user data from Firestore (users collection)
     const docSnap = await getDoc(userDocRef);
 
@@ -47,6 +49,12 @@ const Navbar = () => {
       setUserSchool("No school");
       setUserRole("Guest");
     }
+  };
+
+  const fetchNotificationCount = async (uid: string) => {
+    const q = query(collection(db, "notifications"), where("userId", "==", uid));
+    const querySnapshot = await getDocs(q);
+    setNotificationCount(querySnapshot.size);
   };
 
   const handleLogout = async () => {
@@ -68,12 +76,16 @@ const Navbar = () => {
 
       {/* ICONS AND USER */}
       <div className="flex items-center gap-4 justify-end w-full relative">
-        <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative">
-          <MdOutlineNotificationsActive size={26} className="text-gray-600" />
-          <div className="absolute -top-2 -right-2.5 w-5 h-5 flex items-center justify-center bg-[#018abd] text-white rounded-full text-xs">
-            2
+        <Link href="/notifications">
+          <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative">
+            <MdOutlineNotificationsActive size={26} className="text-gray-600" />
+            {notificationCount > 0 && (
+              <div className="absolute -top-2 -right-2.5 w-5 h-5 flex items-center justify-center bg-[#018abd] text-white rounded-full text-xs">
+                {notificationCount}
+              </div>
+            )}
           </div>
-        </div>
+        </Link>
         <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer">
           <TbHelpCircle size={26} className="text-gray-600" />
         </div>
