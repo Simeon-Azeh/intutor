@@ -32,6 +32,7 @@
     "react-loading-skeleton": "^3.5.0",
     "react-step-progress-bar": "^1.0.3",
     "react-time-picker": "^7.0.0",
+    "react-toastify": "^10.0.6",
     "recharts": "^2.12.7",
     "zod": "^3.23.8"
   },
