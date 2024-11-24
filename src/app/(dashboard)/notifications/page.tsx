@@ -205,7 +205,7 @@ const NotificationsPage = () => {
       )}
       <div className="space-y-4">
         {notifications.map(notification => (
-          <div key={notification.id} className={`p-4 bg-white rounded-md shadow-md ${!notification.read ? 'border-l-4 border-blue-500' : ''}`}>
+          <div key={notification.id} className={`p-4 bg-white rounded-md shadow-md ${!notification.read ? 'border-l-4 border-[#018abd]' : ''}`}>
             <h2 className="text-xl font-semibold">{notification.title}</h2>
             <p className="text-gray-600">{notification.description}</p>
             <p className="text-gray-400 text-sm">{notification.date}</p>
@@ -213,7 +213,7 @@ const NotificationsPage = () => {
               <div className="flex gap-2 mt-2">
                 <button
                   onClick={() => handleMarkAsRead(notification.id)}
-                  className="px-4 py-2 bg-transparent border  text-white rounded-md"
+                  className="px-4 py-2 bg-[#018abd]   text-white rounded-md"
                 >
                   Mark as Read
                 </button>
