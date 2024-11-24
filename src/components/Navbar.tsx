@@ -18,7 +18,7 @@ const Navbar = () => {
   const [userSchool, setUserSchool] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(0);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -26,7 +26,7 @@ const Navbar = () => {
         setUser(currentUser); // Set user info
         fetchUserDetails(currentUser.uid); // Fetch user details (name, school, role)
         if (userRole !== "Admin") {
-          fetchNotificationCount(currentUser.uid); // Fetch notification count for non-admin users
+          checkUnreadNotifications(currentUser.uid); // Check for unread notifications for non-admin users
         }
       } else {
         setUser(null);
@@ -53,10 +53,10 @@ const Navbar = () => {
     }
   };
 
-  const fetchNotificationCount = async (uid: string) => {
+  const checkUnreadNotifications = async (uid: string) => {
     const q = query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false));
     const querySnapshot = await getDocs(q);
-    setNotificationCount(querySnapshot.size);
+    setHasUnreadNotifications(!querySnapshot.empty);
   };
 
   const handleLogout = async () => {
@@ -81,10 +81,8 @@ const Navbar = () => {
         <Link href="/notifications">
           <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer relative">
             <MdOutlineNotificationsActive size={26} className="text-gray-600" />
-            {userRole !== "Admin" && notificationCount > 0 && (
-              <div className="absolute -top-2 -right-2.5 w-5 h-5 flex items-center justify-center bg-[#018abd] text-white rounded-full text-xs">
-                {notificationCount}
-              </div>
+            {userRole !== "Admin" && hasUnreadNotifications && (
+              <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-[#018abd] rounded-full"></div>
             )}
           </div>
         </Link>

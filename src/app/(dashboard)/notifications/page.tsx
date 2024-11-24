@@ -6,6 +6,7 @@ import { db, auth } from "@/firebase/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import UpworkJobLoader from "@/components/Loaders/UpworkJob";
 
 type Notification = {
   id: string;
@@ -184,7 +185,7 @@ const NotificationsPage = () => {
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <UpworkJobLoader />;
   }
 
   if (notifications.length === 0 && events.length === 0 && announcements.length === 0) {
@@ -197,7 +198,7 @@ const NotificationsPage = () => {
       {userRole === "Admin" && (
         <button
           onClick={() => setIsModalOpen(true)}
-          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded-md"
+          className="mb-4 px-4 py-2 bg-[#018abd] text-white rounded-md"
         >
           Create Notification
         </button>
@@ -212,7 +213,7 @@ const NotificationsPage = () => {
               <div className="flex gap-2 mt-2">
                 <button
                   onClick={() => handleMarkAsRead(notification.id)}
-                  className="px-4 py-2 bg-green-500 text-white rounded-md"
+                  className="px-4 py-2 bg-transparent border  text-white rounded-md"
                 >
                   Mark as Read
                 </button>
@@ -242,7 +243,7 @@ const NotificationsPage = () => {
                 <p className="text-gray-400 text-sm">{event.date}</p>
                 <button
                   onClick={() => handlePushNotification(event.title, event.description)}
-                  className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md"
+                  className="mt-2 px-4 py-2 bg-transparent border text-gray-700 font-medium  rounded-md"
                   disabled={buttonLoading}
                 >
                   {buttonLoading ? "Pushing..." : "Push Notification"}
@@ -259,7 +260,7 @@ const NotificationsPage = () => {
                 <p className="text-gray-400 text-sm">{announcement.date}</p>
                 <button
                   onClick={() => handlePushNotification(announcement.title, announcement.description)}
-                  className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md"
+                  className="mt-2 px-4 py-2 bg-transparent border   text-gray-700 font-medium rounded-md"
                   disabled={buttonLoading}
                 >
                   {buttonLoading ? "Pushing..." : "Push Notification"}
@@ -286,12 +287,12 @@ const NotificationsPage = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  className="mt-1 block w-full border border-gray-300 rounded-md  p-2 outline-none"
                   required
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 outline-none">
                   Description
                 </label>
                 <textarea
@@ -299,7 +300,7 @@ const NotificationsPage = () => {
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  className="mt-1 block w-full border border-gray-300 rounded-md  p-2"
                   required
                 />
               </div>
@@ -313,7 +314,7 @@ const NotificationsPage = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                  className="px-4 py-2 bg-[#018abd] text-white rounded-md"
                   disabled={buttonLoading}
                 >
                   {buttonLoading ? "Creating..." : "Create"}
