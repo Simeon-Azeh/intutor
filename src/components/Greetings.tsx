@@ -5,6 +5,7 @@ import { auth } from "@/firebase/firebaseConfig"; // Firebase auth
 import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
 import { FaSun, FaMoon, FaCoffee } from "react-icons/fa"; // Importing icons
 import UpworkJob from "../components/Loaders/UpworkJob"; // Import UpWorkJob loader
+import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
 
 const Greetings = () => {
   const [userName, setUserName] = useState<string>("User");
@@ -12,6 +13,7 @@ const Greetings = () => {
   const [motivation, setMotivation] = useState<string>("");
   const [icon, setIcon] = useState<JSX.Element>(<FaCoffee />); // Default icon
   const [loading, setLoading] = useState<boolean>(true); // Loading state
+  const { darkMode } = useDarkMode(); // Use the dark mode context
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -54,12 +56,12 @@ const Greetings = () => {
   }
 
   return (
-    <div className="gap-4 text-xl font-semibold text-gray-600 bg-white px-4 rounded py-6">
-      <div className="text-gray-600">
+    <div className={`gap-4 text-xl font-semibold ${darkMode ? 'text-gray-300 bg-gray-800' : 'text-gray-600 bg-white'} px-4 rounded py-6`}>
+      <div className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
         {greeting}, 
         <span className="text-[#018abd]"> {userName}</span>!
       </div>
-      <div className="text-xs md:text-sm text-gray-400 font-medium flex items-center flex-row-reverse md:flex-row gap-2 mt-4">
+      <div className={`text-xs md:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'} font-medium flex items-center flex-row-reverse md:flex-row gap-2 mt-4`}>
         {icon}
         {motivation}
       </div>

@@ -15,6 +15,7 @@ import {
 import { FaEdit, FaDownload, FaTrash, FaUserPlus, FaUserMinus, FaSync } from "react-icons/fa";
 import { MdOutlineClass, MdOutlineTimeline } from "react-icons/md";
 import { useRouter } from "next/navigation";
+import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
 
 const data = [
   {
@@ -45,28 +46,27 @@ const data = [
 ];
 
 const AttendanceChart = () => {
-
   const router = useRouter();
+  const { darkMode } = useDarkMode(); // Use the dark mode context
 
   return (
-    <div className="bg-white rounded-lg p-4 h-full">
+    <div className={`rounded-lg p-4 h-full ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold">Attendance</h1>
-        
 
         {/* Dropdown Menu with Admin Actions */}
         <Menu as="div" className="relative">
           <Menu.Button>
             <IoIosMore size={20} className="cursor-pointer" />
           </Menu.Button>
-          <Menu.Items className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border p-1 z-50">
+          <Menu.Items className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg border p-1 z-50 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
             {/* Action: View Attendance by Class */}
             <Menu.Item>
               {({ active }) => (
                 <button
                   className={`${
-                    active ? "bg-gray-100" : ""
-                  } flex items-center w-full px-3 py-2 text-sm text-gray-700`}
+                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                  } flex items-center w-full px-3 py-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                 >
                   <MdOutlineClass className="mr-2" />
                   View by Class
@@ -78,8 +78,8 @@ const AttendanceChart = () => {
                 <button
                   onClick={() => router.push("/attendance")}
                   className={`${
-                    active ? "bg-gray-100" : ""
-                  } flex items-center w-full px-3 py-2 text-sm text-gray-700`}
+                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                  } flex items-center w-full px-3 py-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                 >
                   <MdOutlineTimeline className="mr-2" />
                   View by Time Period
@@ -92,8 +92,8 @@ const AttendanceChart = () => {
               {({ active }) => (
                 <button
                   className={`${
-                    active ? "bg-gray-100" : ""
-                  } flex items-center w-full px-3 py-2 text-sm text-gray-700`}
+                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                  } flex items-center w-full px-3 py-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                 >
                   <FaDownload className="mr-2" />
                   Export Data
@@ -106,8 +106,8 @@ const AttendanceChart = () => {
               {({ active }) => (
                 <button
                   className={`${
-                    active ? "bg-gray-100" : ""
-                  } flex items-center w-full px-3 py-2 text-sm text-gray-700`}
+                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                  } flex items-center w-full px-3 py-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                 >
                   <FaUserPlus className="mr-2" />
                   Add User
@@ -120,8 +120,8 @@ const AttendanceChart = () => {
               {({ active }) => (
                 <button
                   className={`${
-                    active ? "bg-gray-100" : ""
-                  } flex items-center w-full px-3 py-2 text-sm text-gray-700`}
+                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                  } flex items-center w-full px-3 py-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                 >
                   <FaUserMinus className="mr-2" />
                   Remove User
@@ -134,7 +134,7 @@ const AttendanceChart = () => {
               {({ active }) => (
                 <button
                   className={`${
-                    active ? "bg-gray-100" : ""
+                    active ? "bg-gray-100 dark:bg-gray-700" : ""
                   } flex items-center w-full px-3 py-2 text-sm text-red-500`}
                 >
                   <FaSync className="mr-2" />
@@ -148,7 +148,7 @@ const AttendanceChart = () => {
               {({ active }) => (
                 <button
                   className={`${
-                    active ? "bg-gray-100" : ""
+                    active ? "bg-gray-100 dark:bg-gray-700" : ""
                   } flex items-center w-full px-3 py-2 text-sm text-red-500`}
                 >
                   <FaTrash className="mr-2" />
@@ -162,16 +162,16 @@ const AttendanceChart = () => {
 
       <ResponsiveContainer width="100%" height="90%">
         <BarChart width={500} height={300} data={data} barSize={20}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ddd" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? "#444" : "#ddd"} />
           <XAxis
             dataKey="name"
             axisLine={false}
-            tick={{ fill: "#1A1A1A" }}
+            tick={{ fill: darkMode ? "#ddd" : "#1A1A1A" }}
             tickLine={false}
           />
-          <YAxis axisLine={false} tick={{ fill: "#1A1A1A" }} tickLine={false} />
+          <YAxis axisLine={false} tick={{ fill: darkMode ? "#ddd" : "#1A1A1A" }} tickLine={false} />
           <Tooltip
-            contentStyle={{ borderRadius: "10px", borderColor: "#fff" }}
+            contentStyle={{ borderRadius: "10px", borderColor: darkMode ? "#444" : "#fff" }}
           />
           <Legend
             align="left"

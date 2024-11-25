@@ -1,5 +1,6 @@
 import { MdMoreHoriz, MdVisibility } from "react-icons/md";
 import { useState } from "react";
+import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
 
 interface UserCardProps {
   type: string;
@@ -8,6 +9,7 @@ interface UserCardProps {
 
 const UserCard = ({ type, count }: UserCardProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { darkMode } = useDarkMode(); // Use the dark mode context
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -27,7 +29,7 @@ const UserCard = ({ type, count }: UserCardProps) => {
   };
 
   return (
-    <div className="rounded-2xl bg-white p-4 flex-1 min-w-[130px] relative">
+    <div className={`rounded-2xl p-4 flex-1 min-w-[130px] relative ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
       <div className="flex justify-between items-center">
         <span className="text-[10px] bg-[#018abd] px-2 py-1 rounded-full text-white">
           {getAcademicYear()}
@@ -35,14 +37,14 @@ const UserCard = ({ type, count }: UserCardProps) => {
         <MdMoreHoriz className="cursor-pointer" onClick={toggleDropdown} />
       </div>
       <h1 className="text-2xl font-semibold my-4">{count}</h1>
-      <h2 className="capitalize text-sm font-medium text-gray-500">{type}s</h2>
+      <h2 className="capitalize text-sm font-medium text-gray-500 dark:text-gray-400">{type}s</h2>
 
       {/* Dropdown Menu */}
       {isDropdownOpen && (
-        <div className="absolute right-0 top-8 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+        <div className={`absolute right-0 top-8 mt-2 w-40 border rounded-lg shadow-lg z-10 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
           <ul className="p-2">
-            <li className="flex items-center text-sm py-2 px-4 cursor-pointer hover:bg-gray-100">
-              <MdVisibility className="mr-2 text-gray-600" />
+            <li className="flex items-center text-sm py-2 px-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+              <MdVisibility className="mr-2 text-gray-600 dark:text-gray-300" />
               View
             </li>
           </ul>

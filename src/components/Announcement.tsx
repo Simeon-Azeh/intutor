@@ -7,6 +7,7 @@ import { IoIosMore } from "react-icons/io";
 import { db, auth } from "../firebase/firebaseConfig";
 import { collection, query, where, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import EventsLoader from "@/components/Loaders/EventsLoader"; // Import EventsLoader
+import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
 
 const Announcements = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -20,6 +21,7 @@ const Announcements = () => {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<any | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true); // Loading state for announcements
+  const { darkMode } = useDarkMode(); // Use the dark mode context
 
   const fetchUserRole = async () => {
     try {
@@ -156,9 +158,9 @@ const Announcements = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg  relative">
+    <div className={`p-6 rounded-lg relative ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold text-gray-800">Announcements</h1>
+        <h1 className="text-xl font-semibold">Announcements</h1>
         {userRole === "Admin" && (
           <div className="relative">
             <button
@@ -169,13 +171,13 @@ const Announcements = () => {
               <IoIosMore size={20} className="cursor-pointer" />
             </button>
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border border-gray-200 z-10">
-                <Link href="/announcements" className="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700">
+              <div className={`absolute right-0 mt-2 w-40 rounded-md shadow-lg border z-10 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <Link href="/announcements" className={`flex items-center px-4 py-2 ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`}>
                   <FaEye className="mr-2" /> View All
                 </Link>
                 <button
                   onClick={() => openModal()}
-                  className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-gray-700"
+                  className={`flex items-center w-full px-4 py-2 ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'}`}
                 >
                   <FaCalendarPlus className="mr-2" /> Create
                 </button>
@@ -191,7 +193,7 @@ const Announcements = () => {
         ) : announcements.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64">
             <FaCalendarPlus size={48} className="text-gray-400" />
-            <p className="text-gray-500 mt-4">No announcements available</p>
+            <p className="mt-4">No announcements available</p>
             {userRole === "Admin" && (
               <button
                 className="mt-4 bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
@@ -205,17 +207,15 @@ const Announcements = () => {
           announcements.map((announcement, index) => (
             <div
               key={index}
-              className={`border border-[#018abd] shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 hover:shadow-lg ${userRole !== "Admin" ? "pointer-events-none" : ""}`}
+              className={`border shadow-md rounded-lg p-4 transition-transform transform hover:scale-105 hover:shadow-lg ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-[#018abd]'} ${userRole !== "Admin" ? "pointer-events-none" : ""}`}
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-medium text-gray-700">
-                  {announcement.title}
-                </h2>
-                <span className="text-xs text-gray-400 bg-blue-50 rounded-md px-2 py-1">
+                <h2 className="text-sm font-medium">{announcement.title}</h2>
+                <span className="text-xs bg-blue-50 rounded-md px-2 py-1">
                   {announcement.date}
                 </span>
               </div>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm mt-2">
                 {announcement.description}
               </p>
               {userRole === "Admin" && (
@@ -243,41 +243,41 @@ const Announcements = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
-          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+          <div className={`p-8 rounded-lg shadow-lg w-full max-w-lg ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
             <h2 className="text-xl font-semibold mb-4">{selectedAnnouncement ? "Edit Announcement" : "Create New Announcement"}</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Announcement Title</label>
+                <label className="block text-sm font-medium mb-1">Announcement Title</label>
                 <input
                   type="text"
                   name="title"
                   value={newAnnouncement.title}
                   onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-md p-2"
+                  className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#018abd]"
                   placeholder="Enter announcement title"
                   required
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Announcement Description</label>
+                <label className="block text-sm font-medium mb-1">Announcement Description</label>
                 <textarea
                   name="description"
                   value={newAnnouncement.description}
                   onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-md p-2"
+                  className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#018abd]"
                   placeholder="Enter announcement description"
                   required
                 ></textarea>
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Select Date</label>
+                <label className="block text-sm font-medium mb-1">Select Date</label>
                 <input
                   title="date"
                   type="date"
                   name="date"
                   value={newAnnouncement.date}
                   onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-md p-2"
+                  className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#018abd]"
                   required
                 />
               </div>

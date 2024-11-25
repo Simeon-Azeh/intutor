@@ -15,6 +15,7 @@ import {
 import { db, auth } from "../firebase/firebaseConfig";
 import { collection, query, where, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import EventsLoader from "@/components/Loaders/EventsLoader"; // Import EventsLoader
+import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
 
 const EventCalendar = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -34,6 +35,7 @@ const EventCalendar = () => {
   const [loadingEdit, setLoadingEdit] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [loadingEvents, setLoadingEvents] = useState(true); // Loading state for events
+  const { darkMode } = useDarkMode(); // Use the dark mode context
 
   const fetchUserRole = async () => {
     try {
@@ -208,7 +210,7 @@ const EventCalendar = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg  relative">
+    <div className={`p-6 rounded-lg relative ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
       <Calendar
         value={value}
         className="custom-calendar"
@@ -224,18 +226,18 @@ const EventCalendar = () => {
       />
 
       <div className="flex items-center justify-between mt-6">
-        <h1 className="text-xl font-semibold text-gray-700">Events</h1>
+        <h1 className="text-xl font-semibold">Events</h1>
         {userRole === "Admin" && (
           <div className="relative">
             <FiMoreVertical
-              className="text-gray-500 cursor-pointer"
+              className="cursor-pointer"
               size={24}
               onClick={toggleDropdown}
             />
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+              <div className={`absolute right-0 mt-2 w-40 rounded-lg shadow-lg border z-10 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
                 <button
-                  className="flex items-center w-full px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+                  className={`flex items-center w-full px-4 py-2 text-sm ${darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'}`}
                   onClick={() => handleAction("Add Event")}
                   disabled={loadingAdd}
                 >
@@ -253,7 +255,7 @@ const EventCalendar = () => {
         ) : events.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64">
             <CalendarOff size={48} className="text-gray-400" />
-            <p className="text-gray-500 mt-4">No events available</p>
+            <p className="mt-4">No events available</p>
             {userRole === "Admin" && (
               <button
                 className="mt-4 bg-[#018abd] text-white px-4 py-2 rounded-md hover:bg-[#026a8d] transition duration-200"
@@ -267,16 +269,16 @@ const EventCalendar = () => {
         ) : (
           events.map((event) => (
             <div
-              className={`p-4 rounded-lg shadow-md border border-[#018abd] cursor-pointer bg-white relative transition-transform transform hover:scale-105 hover:shadow-lg ${userRole !== "Admin" ? "pointer-events-none" : ""}`}
+              className={`p-4 rounded-lg shadow-md border cursor-pointer relative transition-transform transform hover:scale-105 hover:shadow-lg ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-[#018abd]'} ${userRole !== "Admin" ? "pointer-events-none" : ""}`}
               key={event.id}
               onClick={userRole === "Admin" ? () => handleEventSelection(event) : undefined}
             >
               <div className="flex items-center justify-between">
-                <h2 className="font-semibold text-gray-600">{event.title}</h2>
-                <span className="text-xs text-gray-400">{event.time}</span>
+                <h2 className="font-semibold">{event.title}</h2>
+                <span className="text-xs">{event.time}</span>
               </div>
-              <p className="text-gray-500 text-sm">{event.description}</p>
-              <p className="mt-2 text-xs text-gray-400">Date: {event.date}</p>
+              <p className="text-sm">{event.description}</p>
+              <p className="mt-2 text-xs">Date: {event.date}</p>
             </div>
           ))
         )}
@@ -284,18 +286,18 @@ const EventCalendar = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-20">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-semibold text-gray-700">
+          <div className={`p-6 rounded-lg shadow-lg w-96 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
+            <h2 className="text-xl font-semibold">
               {modalAction} Event
             </h2>
             {modalAction === "Add Event" && (
               <>
-                <p className="mt-4 text-sm text-gray-600">
+                <p className="mt-4 text-sm">
                   Fill out the form to add a new event.
                 </p>
                 <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium">
                       Event Title
                     </label>
                     <input
@@ -310,7 +312,7 @@ const EventCalendar = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium">
                       Date
                     </label>
                     <input
@@ -325,7 +327,7 @@ const EventCalendar = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium">
                       Time
                     </label>
                     <input
@@ -340,7 +342,7 @@ const EventCalendar = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium">
                       Description
                     </label>
                     <textarea
@@ -375,12 +377,12 @@ const EventCalendar = () => {
             )}
             {modalAction === "Edit Event" && selectedEvent && (
               <>
-                <p className="mt-4 text-sm text-gray-600">
+                <p className="mt-4 text-sm">
                   Edit the form to update the event.
                 </p>
                 <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium">
                       Event Title
                     </label>
                     <input
@@ -395,7 +397,7 @@ const EventCalendar = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium">
                       Date
                     </label>
                     <input
@@ -410,7 +412,7 @@ const EventCalendar = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium">
                       Time
                     </label>
                     <input
@@ -425,7 +427,7 @@ const EventCalendar = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium">
                       Description
                     </label>
                     <textarea

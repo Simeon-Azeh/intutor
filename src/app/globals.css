@@ -3,27 +3,18 @@
 @tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-
-:root {
-  --background: #ffffff; /* Light mode background */
-  --foreground: #fdfdfd; /* Light mode text color */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #faf7f7; /* Dark mode background */
-    --foreground: #1b1717; /* Dark mode text color */
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
+html, body {
   font-family: 'Inter', sans-serif;
+  @apply bg-white text-black dark:bg-[#141414] dark:text-gray-100;
+  transition: all 0.3s;
 }
+
+
 .inter {
   font-family: 'Inter', sans-serif;
 }
+
+
 
 /* Tailwind custom styles */
 @layer utilities {
@@ -56,6 +47,7 @@ body {
   scrollbar-width: thin; /* Makes the scrollbar thinner */
   scrollbar-color: #888 #f1f1f1; /* Thumb color and track color */
 }
+
 .react-calendar {
   width: 100% !important;
   border: none !important;
@@ -156,7 +148,7 @@ body {
   background-color: #fdf2fb !important;
 }
 
-.rbc-event-label{
+.rbc-event-label {
   color: gray !important;
   margin-bottom: 5px;
 }
@@ -185,11 +177,9 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-
 .progress-bar-custom {
   height: 4px; /* Adjust the height as needed */
 }
-
 
 /* Add this CSS to your styles */
 .loaderAlt {
@@ -205,7 +195,6 @@ body {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
 
 .user-card-loaders {
   display: grid;
@@ -224,5 +213,3 @@ body {
     grid-template-columns: repeat(2, 1fr); /* 2 cards per row on small screens */
   }
 }
-
-/* styles.css or global.css */

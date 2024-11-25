@@ -40,7 +40,7 @@ const Header: React.FC = () => {
         {/* Navigation Links (visible on medium and larger screens) */}
         <ul className="hidden md:flex space-x-6 text-[#1a1a1a] font-medium items-center mt-4">
         <li className="hover:border-b-2 border-[#018abd] border-spacing-2">
-            <Link href="/pricing">Home</Link>
+            <Link href="/">Home</Link>
           </li>
           {/* Dropdown for Features and How It Works */}
           <li className="relative">
@@ -82,7 +82,7 @@ const Header: React.FC = () => {
             Login
            
           </Link>
-          <Link href="/signin" passHref className="text-black px-4 py-3 font-medium hover:text-[#018abd] border rounded-lg">
+          <Link href="/register" passHref className="text-black px-4 py-3 font-medium hover:text-[#018abd] border rounded-lg">
             Register
           </Link>
          
@@ -99,7 +99,7 @@ const Header: React.FC = () => {
       >
         <ul className="space-y-6 font-medium text-[#1a1a1a] inter">
           {/* Dropdown in Drawer */}
-          <li><Link href="/pricing" onClick={closeDrawer}>Home</Link></li>
+          <li><Link href="/" onClick={closeDrawer}>Home</Link></li>
           <li>
             <button
               type="button"
@@ -125,7 +125,7 @@ const Header: React.FC = () => {
             Login
         
           </Link>
-          <Link href="/signin" passHref className="text-black px-4 py-3 font-medium hover:text-[#018abd] border rounded-lg ">
+          <Link href="/register" passHref className="text-black px-4 py-3 font-medium hover:text-[#018abd] border rounded-lg ">
             Register your school
           </Link>
          

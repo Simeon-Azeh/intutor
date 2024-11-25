@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { DarkModeProvider } from "@/components/DarkModeContext"; // Update this path based on your project structure
 import "./globals.css";
-
-
 
 export const metadata: Metadata = {
   title: "Intutor",
@@ -16,10 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={``}
-      >
-        {children}
+      {/* The `dark` class is toggled dynamically inside the DarkModeProvider */}
+      <body className="transition-colors duration-200">
+        <DarkModeProvider>
+          {children}
+        </DarkModeProvider>
       </body>
     </html>
   );

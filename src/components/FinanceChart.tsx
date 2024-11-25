@@ -14,6 +14,7 @@ import {
 import { IoIosMore } from "react-icons/io";
 import { Menu } from "@headlessui/react";
 import { MdVisibility, MdFileDownload, MdDelete } from "react-icons/md";
+import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
 
 const data = [
   {
@@ -79,8 +80,10 @@ const data = [
 ];
 
 const FinanceChart = () => {
+  const { darkMode } = useDarkMode(); // Use the dark mode context
+
   return (
-    <div className="bg-white rounded-xl w-full h-full p-4">
+    <div className={`rounded-xl w-full h-full p-4 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
       {/* Header with dropdown */}
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold">Finance</h1>
@@ -88,14 +91,14 @@ const FinanceChart = () => {
           <Menu.Button>
             <IoIosMore size={20} className="cursor-pointer" />
           </Menu.Button>
-          <Menu.Items className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border p-1 z-50">
+          <Menu.Items className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg border p-1 z-50 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
             {/* Dropdown Actions */}
             <Menu.Item>
               {({ active }) => (
                 <button
                   className={`${
-                    active ? "bg-gray-100" : ""
-                  } flex items-center w-full px-3 py-2 text-sm text-gray-700`}
+                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                  } flex items-center w-full px-3 py-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                 >
                   <MdVisibility className="mr-2 text-blue-500" size={20} />
                   View Details
@@ -106,8 +109,8 @@ const FinanceChart = () => {
               {({ active }) => (
                 <button
                   className={`${
-                    active ? "bg-gray-100" : ""
-                  } flex items-center w-full px-3 py-2 text-sm text-gray-700`}
+                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                  } flex items-center w-full px-3 py-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}
                 >
                   <MdFileDownload className="mr-2 text-gray-800" size={20} />
                   Export Data
@@ -118,7 +121,7 @@ const FinanceChart = () => {
               {({ active }) => (
                 <button
                   className={`${
-                    active ? "bg-gray-100" : ""
+                    active ? "bg-gray-100 dark:bg-gray-700" : ""
                   } flex items-center w-full px-3 py-2 text-sm text-red-500`}
                 >
                   <MdDelete className="mr-2 text-red-500" size={20} />
@@ -143,16 +146,16 @@ const FinanceChart = () => {
             bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
+          <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? "#444" : "#ddd"} />
           <XAxis
             dataKey="name"
             axisLine={false}
-            tick={{ fill: "#018abd" }}
+            tick={{ fill: darkMode ? "#ddd" : "#018abd" }}
             tickLine={false}
             tickMargin={10}
           />
-          <YAxis axisLine={false} tick={{ fill: "#018abd" }} tickLine={false} tickMargin={20} />
-          <Tooltip />
+          <YAxis axisLine={false} tick={{ fill: darkMode ? "#ddd" : "#018abd" }} tickLine={false} tickMargin={20} />
+          <Tooltip contentStyle={{ borderRadius: "10px", borderColor: darkMode ? "#444" : "#fff" }} />
           <Legend
             align="center"
             verticalAlign="top"

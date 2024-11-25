@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -9,14 +9,14 @@ import Navbar from "@/components/Navbar";
 import Skeleton from "react-loading-skeleton"; // Import the skeleton loader
 import { auth } from "@/firebase/firebaseConfig"; // Import Firebase auth
 import { onAuthStateChanged } from "firebase/auth";
+import { DarkModeProvider, useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
 
-export default function DashboardLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+const DashboardLayoutContent = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isClient, setIsClient] = useState(false); // Track if we are on the client side
   const router = useRouter();
+  const { darkMode } = useDarkMode(); // Use the dark mode context
 
   useEffect(() => {
     // Set isClient to true after component mounts (client-side)
@@ -45,13 +45,13 @@ export default function DashboardLayout({
     return (
       <div className="h-screen flex">
         {/* Sidebar Menu */}
-        <div className="w-[14%] md:w-[8%] lg:w-[18%] xl:w-[18%] p-2 bg-white overflow-y-hidden h-full">
+        <div className="w-[14%] md:w-[8%] lg:w-[18%] xl:w-[18%] p-2 bg-white dark:bg-[#141414] overflow-y-hidden h-full">
           <Skeleton width={100} height={100} className="mx-auto mb-4" /> {/* Skeleton for logo */}
           <Skeleton count={5} height={30} className="mb-3" /> {/* Skeleton for Menu */}
         </div>
 
         {/* Main Content Area */}
-        <div className="w-[86%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-[#F7F8FA] flex flex-col">
+        <div className="w-[86%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-[#F7F8FA] dark:bg-gray-900 flex flex-col">
           {/* Fixed Navbar */}
           <div className="sticky top-0 z-10">
             <Skeleton height={50} className="mb-2" /> {/* Skeleton for Navbar */}
@@ -73,9 +73,9 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="h-screen flex">
+    <div className={`h-screen flex ${darkMode ? 'dark' : ''}`}>
       {/* Sidebar Menu */}
-      <div className="w-[14%] md:w-[8%] lg:w-[18%] xl:w-[18%] p-2 bg-white overflow-y-hidden h-full">
+      <div className="w-[14%] md:w-[8%] lg:w-[18%] xl:w-[18%] p-2 bg-white dark:bg-gray-800 overflow-y-hidden h-full">
         <Link href="/dashboard" className="flex items-center justify-center lg:justify-start ">
           <Image src="/logp.svg" alt="logo" width={100} height={100} />
         </Link>
@@ -83,7 +83,7 @@ export default function DashboardLayout({
       </div>
 
       {/* Main Content Area */}
-      <div className="w-[86%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-[#F7F8FA] flex flex-col">
+      <div className="w-[86%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-[#F7F8FA] dark:bg-gray-900 flex flex-col">
         {/* Fixed Navbar */}
         <div className="sticky top-0 z-10">
           <Navbar />
@@ -95,5 +95,15 @@ export default function DashboardLayout({
         </div>
       </div>
     </div>
+  );
+};
+
+export default function DashboardLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <DarkModeProvider>
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+    </DarkModeProvider>
   );
 }

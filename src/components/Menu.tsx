@@ -7,6 +7,7 @@ import { auth, signOut } from "@/firebase/firebaseConfig"; // Firebase auth and 
 import { onAuthStateChanged } from "firebase/auth"; // Firebase Auth listener
 import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
 import CheckboxList from "@/components/Loaders/CheckboxList"; // Import CheckboxList
+import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
 
 // Define menu items
 const menuItems = [
@@ -42,6 +43,7 @@ const menuItems = [
 const Menu = () => {
   const [role, setRole] = useState<string>("guest"); // Default to "guest"
   const [loading, setLoading] = useState<boolean>(true); // Loading state for fetching user role
+  const { darkMode } = useDarkMode(); // Use the dark mode context
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -89,7 +91,7 @@ const Menu = () => {
   : "/";
 
   return (
-    <div className="text-sm h-full overflow-y-auto">
+    <div className={`text-sm h-full overflow-y-auto ${darkMode ? 'dark' : ''}`}>
       {menuItems.map((section) => (
         <div className="flex flex-col gap-2" key={section.title}>
           <span className="hidden lg:block text-gray-400 font-light my-4">
