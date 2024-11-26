@@ -7,6 +7,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import UpworkJobLoader from "@/components/Loaders/UpworkJob";
+import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
 
 type Notification = {
   id: string;
@@ -42,6 +43,7 @@ const NotificationsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ title: "", description: "" });
   const [notificationCount, setNotificationCount] = useState(0);
+  const { darkMode } = useDarkMode(); // Use the dark mode context
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -193,7 +195,7 @@ const NotificationsPage = () => {
   }
 
   return (
-    <div className="p-4">
+    <div className={`p-4 ${darkMode ? ' text-gray-300' : ' text-black'}`}>
       <h1 className="text-2xl font-semibold mb-4">Notifications</h1>
       {userRole === "Admin" && (
         <button
@@ -205,15 +207,15 @@ const NotificationsPage = () => {
       )}
       <div className="space-y-4">
         {notifications.map(notification => (
-          <div key={notification.id} className={`p-4 bg-white rounded-md shadow-md ${!notification.read ? 'border-l-4 border-[#018abd]' : ''}`}>
+          <div key={notification.id} className={`p-4 rounded-md shadow-md ${darkMode ? 'bg-gray-700' : 'bg-white'} ${!notification.read ? 'border-l-4 border-[#018abd]' : ''}`}>
             <h2 className="text-xl font-semibold">{notification.title}</h2>
-            <p className="text-gray-600">{notification.description}</p>
+            <p className="text-gray-600 dark:text-gray-400">{notification.description}</p>
             <p className="text-gray-400 text-sm">{notification.date}</p>
             {userRole !== "Admin" && (
               <div className="flex gap-2 mt-2">
                 <button
                   onClick={() => handleMarkAsRead(notification.id)}
-                  className="px-4 py-2 bg-[#018abd]   text-white rounded-md"
+                  className="px-4 py-2 bg-[#018abd] text-white rounded-md"
                 >
                   Mark as Read
                 </button>
@@ -237,13 +239,13 @@ const NotificationsPage = () => {
           <h1 className="text-2xl font-semibold mt-8 mb-4">Events</h1>
           <div className="space-y-4">
             {events.map(event => (
-              <div key={event.id} className="p-4 bg-white rounded-md shadow-md">
+              <div key={event.id} className={`p-4 rounded-md shadow-md ${darkMode ? 'bg-gray-700' : 'bg-white'}`}>
                 <h2 className="text-xl font-semibold">{event.title}</h2>
-                <p className="text-gray-600">{event.description}</p>
+                <p className="text-gray-600 dark:text-gray-400">{event.description}</p>
                 <p className="text-gray-400 text-sm">{event.date}</p>
                 <button
                   onClick={() => handlePushNotification(event.title, event.description)}
-                  className="mt-2 px-4 py-2 bg-transparent border text-gray-700 font-medium  rounded-md"
+                  className="mt-2 px-4 py-2 bg-transparent border text-gray-700 dark:text-gray-300 font-medium rounded-md"
                   disabled={buttonLoading}
                 >
                   {buttonLoading ? "Pushing..." : "Push Notification"}
@@ -254,13 +256,13 @@ const NotificationsPage = () => {
           <h1 className="text-2xl font-semibold mt-8 mb-4">Announcements</h1>
           <div className="space-y-4">
             {announcements.map(announcement => (
-              <div key={announcement.id} className="p-4 bg-white rounded-md shadow-md">
+              <div key={announcement.id} className={`p-4 rounded-md shadow-md ${darkMode ? 'bg-gray-700' : 'bg-white'}`}>
                 <h2 className="text-xl font-semibold">{announcement.title}</h2>
-                <p className="text-gray-600">{announcement.description}</p>
+                <p className="text-gray-600 dark:text-gray-400">{announcement.description}</p>
                 <p className="text-gray-400 text-sm">{announcement.date}</p>
                 <button
                   onClick={() => handlePushNotification(announcement.title, announcement.description)}
-                  className="mt-2 px-4 py-2 bg-transparent border   text-gray-700 font-medium rounded-md"
+                  className="mt-2 px-4 py-2 bg-transparent border text-gray-700 dark:text-gray-300 font-medium rounded-md"
                   disabled={buttonLoading}
                 >
                   {buttonLoading ? "Pushing..." : "Push Notification"}
@@ -274,11 +276,11 @@ const NotificationsPage = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-md w-full max-w-lg relative">
+          <div className={`p-4 rounded-md w-full max-w-lg relative ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
             <h2 className="text-xl font-semibold mb-4">Create Notification</h2>
             <form onSubmit={handleCreateNotification}>
               <div className="mb-4">
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="title" className="block text-sm font-medium">
                   Title
                 </label>
                 <input
@@ -287,12 +289,12 @@ const NotificationsPage = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md  p-2 outline-none"
+                  className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 outline-none"
                   required
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 outline-none">
+                <label htmlFor="description" className="block text-sm font-medium">
                   Description
                 </label>
                 <textarea
@@ -300,7 +302,7 @@ const NotificationsPage = () => {
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md  p-2"
+                  className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md p-2"
                   required
                 />
               </div>
