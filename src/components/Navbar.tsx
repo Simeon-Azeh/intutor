@@ -90,8 +90,30 @@ const Navbar = () => {
         <div className="bg-white dark:bg-gray-800 rounded-full w-7 h-7 flex items-center justify-center cursor-pointer">
           <TbHelpCircle size={26} className="text-gray-600 dark:text-gray-300" />
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-full w-7 h-7 flex items-center justify-center cursor-pointer" onClick={toggleDarkMode}>
-          {darkMode ? <BsSun size={24} className="text-gray-600 dark:text-gray-300" /> : <BsMoon size={20} className="text-gray-600 dark:text-gray-300" />}
+        <div className="relative">
+          <input
+            type="checkbox"
+            id="darkModeToggle"
+            className="sr-only"
+            checked={darkMode}
+            onChange={toggleDarkMode}
+          />
+          <label htmlFor="darkModeToggle" className="flex items-center cursor-pointer">
+            <div className="relative">
+              <div className="block bg-gray-600 w-12 h-6 rounded-full"></div>
+              <div
+                className={`absolute left-1 top-1 w-4 h-4 pt-0.5 pl-0.5 pb-0.5 pr-0.5 rounded-full transition-transform ${
+                  darkMode ? 'transform translate-x-6 bg-slate-200 ' : 'bg-gray-300'
+                }`}
+              >
+                {darkMode ? (
+                  <BsSun className="text-gray-600 font-medium" size={14} />
+                ) : (
+                  <BsMoon className="text-gray-800 font-medium  " size={14} />
+                )}
+              </div>
+            </div>
+          </label>
         </div>
         {/* Profile Section */}
         <div
