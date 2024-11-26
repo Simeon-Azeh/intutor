@@ -51,10 +51,10 @@ const Footer: React.FC = () => {
                 <a href="#">FAQs</a>
               </li>
               <li className="mb-2 hover:text-blue-400">
-                <a href="#">Login</a>
+                <a href="/signin">Login</a>
               </li>
               <li className="mb-2 hover:text-blue-400">
-                <a href="#">Register school</a>
+                <a href="/register">Register school</a>
               </li>
               <li className="mb-2 hover:text-blue-400">
                 <a href="#">Contact</a>
