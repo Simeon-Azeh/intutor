@@ -129,11 +129,11 @@ const Navbar = () => {
             </span>
           </div>
           <Image
-            src="/avatar.png"
+            src="/avatar.jpg"
             alt=""
-            width={36}
-            height={36}
-            className="rounded-full"
+            width={32}
+            height={32}
+            className="rounded-full border"
           />
           {/* Dropdown Menu */}
           {showProfileDropdown && (
