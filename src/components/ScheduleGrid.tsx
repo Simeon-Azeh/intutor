@@ -79,7 +79,7 @@ const CustomDropdown: React.FC<{
   );
 };
 
-const ScheduleGrid = () => {
+const ScheduleGrid: React.FC<{ school: string | null }> = ({ school }) => {
   const [schedules, setSchedules] = useState<any[]>([]);
   const [courses, setCourses] = useState<Subject[]>([]);
   const [newSchedule, setNewSchedule] = useState<{ [key: string]: string }>({});
@@ -88,13 +88,19 @@ const ScheduleGrid = () => {
 
   useEffect(() => {
     const fetchSchedules = async () => {
-      const querySnapshot = await getDocs(collection(db, "schedules"));
+      if (!school) return;
+
+      const q = query(collection(db, "schedules"), where("school", "==", school));
+      const querySnapshot = await getDocs(q);
       const schedulesList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setSchedules(schedulesList);
     };
 
     const fetchCourses = async () => {
-      const querySnapshot = await getDocs(collection(db, "courses"));
+      if (!school) return;
+
+      const q = query(collection(db, "courses"), where("school", "==", school));
+      const querySnapshot = await getDocs(q);
       const coursesList: Subject[] = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
@@ -104,7 +110,7 @@ const ScheduleGrid = () => {
 
     fetchSchedules();
     fetchCourses();
-  }, []);
+  }, [school]);
 
   const handleCourseChange = (day: string, time: string, courseId: string) => {
     setNewSchedule(prevState => ({

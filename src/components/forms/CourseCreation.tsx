@@ -4,7 +4,7 @@ import { collection, query, where, getDocs, addDoc, doc, getDoc } from "firebase
 import dayjs, { Dayjs } from 'dayjs'; // Import Dayjs
 import { DatePicker } from 'antd'; // Import DatePicker from antd
 import { TbCopyCheck } from "react-icons/tb";
-
+import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
 
 type Subject = {
   id: string;
@@ -49,11 +49,11 @@ const CustomDropdown: React.FC<{
         {value || title}
       </div>
       {isOpen && (
-        <div className="absolute z-10 w-full bg-white border rounded-md mt-1">
+        <div className="absolute z-10 w-full bg-white dark:bg-gray-800 border rounded-md mt-1">
           {options.map(option => (
             <div
               key={option}
-              className="p-2 cursor-pointer hover:bg-gray-200"
+              className="p-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
               onClick={() => handleSelect(option)}
             >
               {option}
@@ -78,6 +78,7 @@ const CourseCreationForm: React.FC<CourseCreationFormProps> = ({ onCreate }) => 
   const [totalClasses, setTotalClasses] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { darkMode } = useDarkMode(); // Use the dark mode context
 
   useEffect(() => {
     const fetchTeachersAndAdminData = async () => {
@@ -169,16 +170,16 @@ const CourseCreationForm: React.FC<CourseCreationFormProps> = ({ onCreate }) => 
             value={newSubject.name}
             onChange={handleInputChange}
             placeholder="| Course Name"
-            className="p-2 border rounded-md w-full mb-4 outline-none text-[#018abd] focus:border-[#018abd] focus:ring-2 focus:ring-[#018abd] focus:ring-opacity-50 font-medium"
+            className={`p-2 border rounded-md w-full mb-4 outline-none ${darkMode ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-black border-gray-200'} focus:border-[#018abd] focus:ring-2 focus:ring-[#018abd] focus:ring-opacity-50 font-medium`}
             required
           />
-          <div className="p-2 pb-4 border rounded-md mb-4 ">
-            <label className="font-medium mb-4 text-[#333]">Teachers:</label>
+          <div className={`p-2 pb-4 border rounded-md mb-4 ${darkMode ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-black border-gray-200'}`}>
+            <label className="font-medium mb-4 text-[#333] dark:text-gray-300">Teachers:</label>
             <div className="flex flex-wrap gap-2 mt-4">
               {teachers.map(teacher => (
                 <div
                   key={teacher.id}
-                  className={`p-2 border rounded-md font-medium cursor-pointer text-[#1a1a1a] ${newSubject.teachers.includes(teacher.name) ? 'border-[#018abd] shadow-md' : ''}`}
+                  className={`p-2 border rounded-md font-medium cursor-pointer ${darkMode ? 'text-gray-300 border-gray-700' : 'text-[#1a1a1a]'} ${newSubject.teachers.includes(teacher.name) ? 'border-[#018abd] shadow-md' : ''}`}
                   onClick={() => handleTeacherChange(teacher.id)}
                 >
                   <input
@@ -211,12 +212,12 @@ const CourseCreationForm: React.FC<CourseCreationFormProps> = ({ onCreate }) => 
             <DatePicker
               placeholder="Start Date"
               onChange={(date, dateString) => handleDateChange(date, dateString, 'startDate')}
-              className="p-2 border rounded-md w-full font-inter font-medium text-xl text-[#333]"
+              className={`p-2 border rounded-md w-full font-inter font-medium text-xl ${darkMode ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-black border-gray-200'}`}
             />
             <DatePicker
               placeholder="End Date"
               onChange={(date, dateString) => handleDateChange(date, dateString, 'endDate')}
-              className="p-2 border rounded-md w-full font-inter font-medium text-xl text-[#333]"
+              className={`p-2 border rounded-md w-full font-inter font-medium text-xl ${darkMode ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-white text-black border-gray-200'}`}
             />
             <input type="hidden" name="school" value={newSubject.school} />
             {curriculumType.length > 0 && (

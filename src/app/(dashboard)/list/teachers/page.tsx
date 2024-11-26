@@ -15,6 +15,9 @@ import { X, UserPen, UserX } from 'lucide-react';
 import { collection, query, where, getDocs, doc, getDoc, deleteDoc, limit, startAfter, QueryDocumentSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import TableLoader from "@/components/Loaders/TableLoader"; // Import TableLoader
+import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
+import { ArrowDownAZ } from 'lucide-react';
+
 
 type Teacher = {
     id: string;
@@ -76,6 +79,7 @@ const TeacherListPage = () => {
     const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
     const [totalPages, setTotalPages] = useState(1);
     const router = useRouter();
+    const { darkMode } = useDarkMode(); // Use the dark mode context
 
     const fetchTeachers = async (page: number) => {
         setLoading(true);
@@ -168,7 +172,7 @@ const TeacherListPage = () => {
     const renderRow = (item: Teacher) => (
         <tr
             key={item.id}
-            className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-orange-50"
+            className={`border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} even:bg-slate-50 even:dark:text-slate-50 even:dark:bg-gray-700 text-sm hover:bg-orange-50 dark:hover:bg-gray-600`}
         >
             <td className="flex items-center gap-4 p-4">
                 <Image
@@ -194,7 +198,7 @@ const TeacherListPage = () => {
                         <button 
                         type="button"
                         title={`View ${item.name}`} // Add title for accessibility
-                        className="w-7 h-7 flex items-center justify-center rounded-full text-gray-600">
+                        className="w-7 h-7 flex items-center justify-center rounded-full text-gray-600 dark:text-white">
                         <LuEye size={18} />
                         </button>
                     </Link>
@@ -203,7 +207,7 @@ const TeacherListPage = () => {
                             <button 
                                 type="button"
                                 title={`Edit ${item.name}`} // Add title for accessibility
-                                className="w-7 h-7 flex items-center justify-center rounded-full text-gray-700"
+                                className="w-7 h-7 flex items-center justify-center rounded-full text-gray-700 dark:text-white"
                                 onClick={() => handleEditClick(item)}
                             >
                                 <UserPen size={18} />
@@ -211,7 +215,7 @@ const TeacherListPage = () => {
                             <button 
                                 type="button"
                                 title={`Delete ${item.name}`} // Add title for accessibility
-                                className="w-7 h-7 flex items-center justify-center rounded-full text-red-600"
+                                className="w-7 h-7 flex items-center justify-center rounded-full text-red-600 dark:text-red-400"
                                 onClick={() => handleDeleteClick(item)}
                             >
                                 <UserX size={18} />
@@ -224,7 +228,7 @@ const TeacherListPage = () => {
     );
 
     return (
-        <div className="bg-white p-4 rounded-md flex-1 m-4 mt-2">
+        <div className={`p-4 rounded-md flex-1 m-4 mt-2 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
             {/* TOP */}
             <div className="flex items-center justify-between">
                 <h1 className="hidden md:block text-lg font-semibold">All Teachers</h1>
@@ -240,8 +244,8 @@ const TeacherListPage = () => {
                         <button
                         type="button"
                         title="Sort"
-                         className="w-8 h-8 flex items-center justify-center rounded-full">
-                            <Image src="/sort.png" alt="" width={14} height={14} />
+                         className="w-8 h-8 flex border items-center justify-center rounded-full">
+                            <ArrowDownAZ size={19} />
                         </button>
                         {userRole === "Admin" && (
                             <FormModal table="teacher" type="create" />
@@ -266,7 +270,7 @@ const TeacherListPage = () => {
             {/* EDIT MODAL */}
             {isEditModalOpen && selectedTeacher && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-4 rounded-md w-full max-w-lg relative">
+                    <div className={`p-4 rounded-md w-full max-w-lg relative ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
                         <EditTeacherForm data={selectedTeacher} onSubmit={handleEditSubmit} />
                         <button
                         title="close"
@@ -283,7 +287,7 @@ const TeacherListPage = () => {
             {/* DELETE CONFIRMATION MODAL */}
             {isDeleteModalOpen && teacherToDelete && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-4 rounded-md w-full max-w-lg relative">
+                    <div className={`p-4 rounded-md w-full max-w-lg relative ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
                         <p className="text-center font-medium">Are you sure you want to delete {teacherToDelete.name}?</p>
                         <div className="flex justify-center gap-4 mt-4">
                             <button

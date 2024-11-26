@@ -15,6 +15,7 @@ import StudentForm from "@/components/forms/StudentForm";
 import { X, UserPen, UserX, Plus } from 'lucide-react';
 import { collection, query, where, getDocs, doc, getDoc, deleteDoc, limit, startAfter, QueryDocumentSnapshot } from "firebase/firestore";
 import TableLoader from "@/components/Loaders/TableLoader"; // Import TableLoader
+import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
 
 type Student = {
   id: string;
@@ -71,6 +72,7 @@ const StudentListPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const { darkMode } = useDarkMode(); // Use the dark mode context
 
   const fetchStudents = async (page: number) => {
     setLoading(true);
@@ -152,7 +154,7 @@ const StudentListPage = () => {
   const renderRow = (item: Student) => (
     <tr
       key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-orange-50"
+      className={`border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} even:bg-slate-50 even:dark:text-slate-50 even:dark:bg-gray-700 text-sm hover:bg-orange-50 dark:hover:bg-gray-600`}
     >
       <td className="flex items-center gap-4 p-4">
         <Image
@@ -177,7 +179,7 @@ const StudentListPage = () => {
             <button 
             type="button"
             title={`View ${item.name}`} // Add title for accessibility
-            className="w-7 h-7 flex items-center justify-center rounded-full  text'#333' ">
+            className="w-7 h-7 flex items-center justify-center rounded-full text-gray-600 dark:text-white">
               <LuEye size={18} />
             </button>
           </Link>
@@ -186,7 +188,7 @@ const StudentListPage = () => {
               <button 
                 type="button"
                 title={`Edit ${item.name}`} // Add title for accessibility
-                className="w-7 h-7 flex items-center justify-center rounded-full text-gray-700"
+                className="w-7 h-7 flex items-center justify-center rounded-full dark:text-white text-gray-700"
                 onClick={() => handleEditClick(item)}
               >
                 <UserPen size={18} />
@@ -194,7 +196,7 @@ const StudentListPage = () => {
               <button 
                 type="button"
                 title={`Delete ${item.name}`} // Add title for accessibility
-                className="w-7 h-7 flex items-center justify-center rounded-full text-red-600"
+                className="w-7 h-7 flex items-center justify-center rounded-full dark:text-red-400 text-red-600"
                 onClick={() => handleDeleteClick(item)}
               >
                 <UserX size={18} />
@@ -207,7 +209,7 @@ const StudentListPage = () => {
   );
 
   return (
-    <div className="bg-white p-4 rounded-md flex-1 m-4 mt-2">
+    <div className={`p-4 rounded-md flex-1 m-4 mt-2 ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
       {/* TOP */}
       <div className="flex items-center justify-between">
         <h1 className="hidden md:block text-lg font-semibold">All Students</h1>
@@ -217,7 +219,7 @@ const StudentListPage = () => {
             <button 
               type="button"
               title="Filter"
-              className="w-8 h-8 flex items-center justify-center rounded-full "
+              className="w-8 h-8 flex items-center justify-center rounded-full"
             >
               <IoFilterCircleOutline size={24} />
             </button>
@@ -257,7 +259,7 @@ const StudentListPage = () => {
       {/* CREATE MODAL */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-md w-full max-w-lg relative">
+          <div className={`p-4 rounded-md w-full max-w-lg relative ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
             <StudentForm type="create" />
             <button
               title="Close"
@@ -274,7 +276,7 @@ const StudentListPage = () => {
       {/* EDIT MODAL */}
       {isEditModalOpen && selectedStudent && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-md w-full max-w-lg relative">
+          <div className={`p-4 rounded-md w-full max-w-lg relative ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
             <EditStudentForm data={selectedStudent} onSubmit={handleEditSubmit} />
             <button
               title="Close"
@@ -291,7 +293,7 @@ const StudentListPage = () => {
       {/* DELETE CONFIRMATION MODAL */}
       {isDeleteModalOpen && studentToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-md w-full max-w-lg relative">
+          <div className={`p-4 rounded-md w-full max-w-lg relative ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
             <p className="text-center font-medium">Are you sure you want to delete {studentToDelete.name}?</p>
             <div className="flex justify-center gap-4 mt-4">
               <button
