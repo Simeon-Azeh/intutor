@@ -12,7 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { FaEdit, FaDownload, FaTrash, FaUserPlus, FaUserMinus, FaSync } from "react-icons/fa";
+import { FaEdit, FaDownload, FaTrash, FaUserPlus, FaUserMinus, FaSync, FaInfoCircle } from "react-icons/fa";
 import { MdOutlineClass, MdOutlineTimeline } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import based on your project structure
@@ -20,34 +20,36 @@ import { useDarkMode } from "@/components/DarkModeContext"; // Adjust the import
 const data = [
   {
     name: "Mon",
-    Present: 60,
-    Absent: 40,
+    Present: 0,
+    Absent: 0,
   },
   {
     name: "Tue",
-    Present: 70,
-    Absent: 60,
+    Present: 0,
+    Absent: 0,
   },
   {
     name: "Wed",
-    Present: 90,
-    Absent: 75,
+    Present: 0,
+    Absent: 0,
   },
   {
     name: "Thu",
-    Present: 90,
-    Absent: 75,
+    Present: 0,
+    Absent: 0,
   },
   {
     name: "Fri",
-    Present: 65,
-    Absent: 55,
+    Present: 0,
+    Absent: 0,
   },
 ];
 
 const AttendanceChart = () => {
   const router = useRouter();
   const { darkMode } = useDarkMode(); // Use the dark mode context
+
+  const hasData = data.some(item => item.Present !== 0 || item.Absent !== 0);
 
   return (
     <div className={`rounded-lg p-4 h-full ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-black'}`}>
@@ -160,38 +162,45 @@ const AttendanceChart = () => {
         </Menu>
       </div>
 
-      <ResponsiveContainer width="100%" height="90%">
-        <BarChart width={500} height={300} data={data} barSize={20}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? "#444" : "#ddd"} />
-          <XAxis
-            dataKey="name"
-            axisLine={false}
-            tick={{ fill: darkMode ? "#ddd" : "#1A1A1A" }}
-            tickLine={false}
-          />
-          <YAxis axisLine={false} tick={{ fill: darkMode ? "#ddd" : "#1A1A1A" }} tickLine={false} />
-          <Tooltip
-            contentStyle={{ borderRadius: "10px", borderColor: darkMode ? "#444" : "#fff" }}
-          />
-          <Legend
-            align="left"
-            verticalAlign="top"
-            wrapperStyle={{ paddingTop: "20px", paddingBottom: "40px" }}
-          />
-          <Bar
-            dataKey="Present"
-            fill="#018abd"
-            legendType="circle"
-            radius={[2, 2, 0, 0]}
-          />
-          <Bar
-            dataKey="Absent"
-            fill="#ff6347"
-            legendType="circle"
-            radius={[2, 2, 0, 0]}
-          />
-        </BarChart>
-      </ResponsiveContainer>
+      {hasData ? (
+        <ResponsiveContainer width="100%" height="90%">
+          <BarChart width={500} height={300} data={data} barSize={20}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? "#444" : "#ddd"} />
+            <XAxis
+              dataKey="name"
+              axisLine={false}
+              tick={{ fill: darkMode ? "#ddd" : "#1A1A1A" }}
+              tickLine={false}
+            />
+            <YAxis axisLine={false} tick={{ fill: darkMode ? "#ddd" : "#1A1A1A" }} tickLine={false} />
+            <Tooltip
+              contentStyle={{ borderRadius: "10px", borderColor: darkMode ? "#444" : "#fff" }}
+            />
+            <Legend
+              align="left"
+              verticalAlign="top"
+              wrapperStyle={{ paddingTop: "20px", paddingBottom: "40px" }}
+            />
+            <Bar
+              dataKey="Present"
+              fill="#018abd"
+              legendType="circle"
+              radius={[2, 2, 0, 0]}
+            />
+            <Bar
+              dataKey="Absent"
+              fill="#ff6347"
+              legendType="circle"
+              radius={[2, 2, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-full text-gray-400">
+          <FaInfoCircle size={50} className="mb-4" />
+          <p className="text-lg text-center">Attendance data will update over time.</p>
+        </div>
+      )}
     </div>
   );
 };

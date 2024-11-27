@@ -179,7 +179,7 @@ const CourseCreationForm: React.FC<CourseCreationFormProps> = ({ onCreate }) => 
               {teachers.map(teacher => (
                 <div
                   key={teacher.id}
-                  className={`p-2 border rounded-md font-medium cursor-pointer ${darkMode ? 'text-gray-300 border-gray-700' : 'text-[#1a1a1a]'} ${newSubject.teachers.includes(teacher.name) ? 'border-[#018abd] shadow-md' : ''}`}
+                  className={`p-2 border rounded-md font-medium cursor-pointer ${darkMode ? 'text-gray-300 border-gray-700' : 'text-[#1a1a1a]'} ${newSubject.teachers.includes(teacher.name) ? 'border-[#018abd] shadow-md dark:border-white' : ''}`}
                   onClick={() => handleTeacherChange(teacher.id)}
                 >
                   <input

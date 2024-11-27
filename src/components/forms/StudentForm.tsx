@@ -28,6 +28,8 @@ const schema = z.object({
     birthday: z.string().refine(val => !isNaN(Date.parse(val)), { message: "Birthday is required!" }),
     sex: z.enum(["male", "female"], { message: "Sex is required!" }),
     classAssigned: z.string().min(1, { message: "Class is required!" }),
+    level: z.enum(["Bachelors", "Masters", "PhD"], { message: "Level is required!" }),
+   
 });
 
 type Inputs = z.infer<typeof schema>;
@@ -63,6 +65,8 @@ const StudentForm: React.FC<StudentFormProps> = ({ data = {}, type }) => {
             birthday: data?.birthday ? new Date(data.birthday).toISOString().split('T')[0] : '',
             sex: data?.sex || 'male',
             classAssigned: data?.classAssigned || '',
+            level: data?.level || 'Bachelors',
+          
         }
     });
 
@@ -115,6 +119,8 @@ const StudentForm: React.FC<StudentFormProps> = ({ data = {}, type }) => {
                 studentId: studentId,
                 grade: "", // Grade will be updated by something else
                 classAssigned: formData.classAssigned,
+                level: formData.level,
+                
             };
 
             await setDoc(doc(db, "students", user.uid), studentData);
@@ -253,6 +259,24 @@ const StudentForm: React.FC<StudentFormProps> = ({ data = {}, type }) => {
                                     </p>
                                 )}
                             </div>
+                            <div className="flex flex-col gap-2 w-full md:w-1/4">
+                                <label className="text-xs text-gray-500">Level</label>
+                                <select
+                                    className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full outline-none"
+                                    {...register("level")}
+                                    defaultValue={data?.level || 'Bachelors'}
+                                >
+                                    <option value="Bachelors">Bachelors</option>
+                                    <option value="Masters">Masters</option>
+                                    <option value="PhD">PhD</option>
+                                </select>
+                                {errors.level?.message && (
+                                    <p className="text-xs text-red-400">
+                                        {errors.level.message.toString()}
+                                    </p>
+                                )}
+                            </div>
+                           
                         </div>
                         <div className="flex justify-between">
                             <button type="button" onClick={prevStep} className="border  text-gray-600 p-2 px-4 rounded-md">
