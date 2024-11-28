@@ -129,7 +129,7 @@ const Navbar = () => {
             </span>
           </div>
           <Image
-            src="/avatar.jpg"
+            src="/dp.jpg"
             alt=""
             width={32}
             height={32}
