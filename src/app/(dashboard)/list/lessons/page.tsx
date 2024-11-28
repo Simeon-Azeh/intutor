@@ -83,7 +83,7 @@ const Module: React.FC<ModuleProps> = ({ control, register, errors, darkMode, mo
           <button type="button" onClick={() => removeSubModule(subModuleIndex)} className="text-red-500">Remove Submodule</button>
         </div>
       ))}
-      <button type="button" onClick={() => appendSubModule({ subModuleName: "", description: "", materials: [] })} className="border text-gray-800 w-[20%] justify-center dark:text-white p-1 rounded-md flex items-center gap-1">
+      <button type="button" onClick={() => appendSubModule({ subModuleName: "", description: "", materials: [] })} className="border text-gray-800 md:w-[20%] justify-center dark:text-white p-1 rounded-md flex items-center gap-1">
         <FaPlus /> Add Submodule
       </button>
       <button type="button" onClick={() => removeModule(moduleIndex)} className="text-red-500">Remove Module</button>
@@ -236,10 +236,10 @@ const LessonListPage = () => {
             removeModule={removeModule}
           />
         ))}
-        <button type="button" onClick={() => appendModule({ moduleName: "", subModules: [] })} className="bg-[#018abd] w-[20%] text-center justify-center text-white p-1 rounded-md flex items-center gap-1">
+        <button type="button" onClick={() => appendModule({ moduleName: "", subModules: [] })} className="bg-[#018abd] md:w-[20%] text-center justify-center text-white p-1 rounded-md flex items-center gap-1">
           <FaPlus /> Add Module
         </button>
-        <button type="submit" className="bg-[#018abd] text-white p-2 rounded-md" disabled={loading}>
+        <button type="submit" className="bg-[#018abd] text-white p-2 rounded-md md:w-[20%] shadow-md" disabled={loading}>
           {loading ? "Creating..." : "Create Lesson Plan"}
         </button>
       </form>
